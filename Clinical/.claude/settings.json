@@ -1,0 +1,27 @@
+{
+  "name": "Clinical OT Settings",
+  "description": "Settings for occupational therapy clinical work",
+  "model": "claude-haiku-4-5-20251001",
+  "fast": false,
+  "permissions": {
+    "allow": [
+      "read",
+      "bash:run"
+    ]
+  },
+  "activeSkills": [
+    "icf-mapper",
+    "ot-report-writer",
+    "intervention-designer"
+  ],
+  "hooks": {
+    "on-folder-open": "Load clinical context and activate /report command"
+  },
+  "keybindings": {
+    "ctrl+r": "/report"
+  },
+  "environment": {
+    "DOMAIN": "clinical",
+    "CONTEXT": "OT evaluation, intervention, outcome documentation"
+  }
+}

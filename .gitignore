@@ -1,0 +1,49 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+dist/
+.next/
+out/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependencies
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sensitive data (Clinical data, credentials)
+Clinical/projects/*/notes.md
+Clinical/projects/*/evaluation/*.md
+Research/datasets/raw/
+*.csv
+*.xlsx
+
+# Database
+supabase/migrations/*.sql.backup
+
+# Temporary files
+.claude/temp/
+*.tmp
+
+# Claude session files
+.claude/session/
+
+# Build artifacts
+*.pyc
+__pycache__/

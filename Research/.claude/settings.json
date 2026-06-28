@@ -1,0 +1,28 @@
+{
+  "name": "Research Settings",
+  "description": "Settings for research and evidence-based work",
+  "model": "claude-sonnet-4-6",
+  "fast": false,
+  "permissions": {
+    "allow": [
+      "read",
+      "bash:run"
+    ]
+  },
+  "activeSkills": [
+    "research-analyzer",
+    "evidence-reviewer",
+    "apa-writer",
+    "data-analyst"
+  ],
+  "hooks": {
+    "on-folder-open": "Load research context and activate /paper command"
+  },
+  "keybindings": {
+    "ctrl+p": "/paper"
+  },
+  "environment": {
+    "DOMAIN": "research",
+    "CONTEXT": "Literature review, critical appraisal, data analysis, publication"
+  }
+}

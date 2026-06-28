@@ -1,0 +1,37 @@
+{
+  "name": "Development Settings",
+  "description": "Settings for AI development and automation",
+  "model": "claude-opus-4-8",
+  "fast": true,
+  "permissions": {
+    "allow": [
+      "read",
+      "bash:run",
+      "edit"
+    ]
+  },
+  "activeSkills": [
+    "n8n-builder",
+    "nextjs-builder",
+    "gas-architect",
+    "ux-reviewer"
+  ],
+  "mcp": {
+    "enabled": [
+      "github",
+      "figma",
+      "supabase"
+    ]
+  },
+  "hooks": {
+    "on-folder-open": "Load development context and activate /deploy command"
+  },
+  "keybindings": {
+    "ctrl+d": "/deploy"
+  },
+  "environment": {
+    "DOMAIN": "development",
+    "CONTEXT": "App development, automation workflows, CI/CD, API integration",
+    "STACK": "Next.js, TypeScript, Tailwind, Supabase, n8n, Vercel"
+  }
+}
