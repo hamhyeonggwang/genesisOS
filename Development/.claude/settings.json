@@ -1,6 +1,6 @@
 {
   "name": "Development Settings",
-  "description": "Settings for AI development and automation",
+  "description": "Settings for app and web development",
   "model": "claude-opus-4-8",
   "fast": true,
   "permissions": {
@@ -11,9 +11,8 @@
     ]
   },
   "activeSkills": [
-    "n8n-builder",
     "nextjs-builder",
-    "gas-architect",
+    "n8n-builder",
     "ux-reviewer"
   ],
   "mcp": {
@@ -31,7 +30,7 @@
   },
   "environment": {
     "DOMAIN": "development",
-    "CONTEXT": "App development, automation workflows, CI/CD, API integration",
+    "CONTEXT": "App development, web development, automation, CI/CD",
     "STACK": "Next.js, TypeScript, Tailwind, Supabase, n8n, Vercel"
   }
 }

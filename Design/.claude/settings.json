@@ -1,0 +1,32 @@
+{
+  "name": "Design Settings",
+  "description": "Settings for UI/UX design and prototyping",
+  "model": "claude-opus-4-8",
+  "fast": true,
+  "permissions": {
+    "allow": [
+      "read",
+      "bash:run"
+    ]
+  },
+  "activeSkills": [
+    "design-prototyper",
+    "design-system-builder",
+    "ux-reviewer"
+  ],
+  "mcp": {
+    "enabled": [
+      "figma"
+    ]
+  },
+  "hooks": {
+    "on-folder-open": "Load design context and activate /design command"
+  },
+  "keybindings": {
+    "ctrl+i": "/design"
+  },
+  "environment": {
+    "DOMAIN": "design",
+    "CONTEXT": "UI/UX design, wireframes, mockups, Figma, design systems"
+  }
+}

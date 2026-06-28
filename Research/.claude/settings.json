@@ -1,6 +1,6 @@
 {
   "name": "Research Settings",
-  "description": "Settings for research and evidence-based work",
+  "description": "Settings for research, paper management, and writing",
   "model": "claude-sonnet-4-6",
   "fast": false,
   "permissions": {
@@ -10,7 +10,7 @@
     ]
   },
   "activeSkills": [
-    "research-analyzer",
+    "paper-researcher",
     "evidence-reviewer",
     "apa-writer",
     "data-analyst"
@@ -23,6 +23,6 @@
   },
   "environment": {
     "DOMAIN": "research",
-    "CONTEXT": "Literature review, critical appraisal, data analysis, publication"
+    "CONTEXT": "Paper discovery, literature review, paper writing, data analysis"
   }
 }

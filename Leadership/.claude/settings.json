@@ -1,0 +1,27 @@
+{
+  "name": "Leadership Settings",
+  "description": "Settings for team leadership and management",
+  "model": "claude-sonnet-4-6",
+  "fast": false,
+  "permissions": {
+    "allow": [
+      "read",
+      "bash:run"
+    ]
+  },
+  "activeSkills": [
+    "team-report-writer",
+    "project-manager",
+    "decision-logger"
+  ],
+  "hooks": {
+    "on-folder-open": "Load leadership context and activate /team-report command"
+  },
+  "keybindings": {
+    "ctrl+t": "/team-report"
+  },
+  "environment": {
+    "DOMAIN": "leadership",
+    "CONTEXT": "Team planning, coordination, reporting, decision making"
+  }
+}

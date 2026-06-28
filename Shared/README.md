@@ -7,17 +7,17 @@
 ### skills/ — 재사용 가능한 전문성 (16개)
 
 **Phase 1 (고우선순위)**
-- `icf-mapper/` — ICF 평가 → 목표 매핑
-- `ot-report-writer/` — 평가 보고서 자동화
-- `n8n-builder/` — 자동화 워크플로우 설계
-- `nextjs-builder/` — Next.js 앱 개발
+- `team-report-writer/` — 팀 주간/월간 보고서 자동화
+- `paper-researcher/` — 논문 검색, 수집, 정리
+- `design-prototyper/` — UI/UX 디자인 → 프로토타입
+- `nextjs-builder/` — 앱/웹 개발
 
 **Phase 2 & 3**
-- Clinical: intervention-designer, protocol-designer
-- Research: research-analyzer, evidence-reviewer, apa-writer, data-analyst
-- Education: lecture-planner, slide-builder, quiz-generator
-- Development: gas-architect, ux-reviewer
-- Cross: delphi-facilitator
+- Leadership: project-manager, decision-logger
+- Design: design-system-builder, ux-reviewer
+- Research: evidence-reviewer, apa-writer, data-analyst
+- Clinical: icf-mapper, ot-report-writer, intervention-designer
+- Cross: n8n-builder, delphi-facilitator, protocol-designer
 
 ### knowledge/ — 고정 지식 베이스
 
