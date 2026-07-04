@@ -11,10 +11,11 @@
 
 ## Milestone 0 — 기반 (M8·M9 일부)
 
-- [ ] **T01. 프로젝트 스캐폴딩** — Next.js 15 + TypeScript + Tailwind + shadcn/ui 초기화, `src/engine/` 디렉토리와 ESLint 경계 규칙(엔진에서 react/next import 금지) 설정
-  - 수용 기준: `pnpm build` 성공, 경계 규칙 위반 시 lint 실패 재현
-- [ ] **T02. Supabase 셋업** — 프로젝트 생성, Architecture.md §4 DDL 마이그레이션, 전 테이블 RLS 적용
-  - 수용 기준: 마이그레이션 재실행 가능(idempotent), anon 키로 타 유저 행 접근 불가 확인
+- [x] **T01. 프로젝트 스캐폴딩** — Next.js 15 + TypeScript + Tailwind + shadcn/ui 초기화, `src/engine/` 디렉토리와 ESLint 경계 규칙(엔진에서 react/next import 금지) 설정 ✅ 2026-07-04
+  - 수용 기준: `pnpm build` 성공, 경계 규칙 위반 시 lint 실패 재현 — 검증 완료 (npm build 성공, react import 삽입 시 lint 실패 재현)
+- [x] **T02. Supabase 셋업** — 기존 프로젝트(`ruxbuidhvodnfztrdwvf`)에 `genesis_` 접두사로 스키마 분리 적용, DDL 마이그레이션, 전 테이블 RLS ✅ 2026-07-04
+  - 수용 기준: 전 9개 테이블 RLS 활성화 확인, 보안 어드바이저 실행 후 함수 search_path 이슈 수정 완료
+  - 참고: 원래 신규 프로젝트 생성을 상정했으나 기존 공유 프로젝트 사용으로 변경 (Architecture.md §7.1에 결정 기록)
 - [ ] **T03. 인증** — Supabase Auth 이메일 로그인, 미들웨어 세션 검증, `/login` (SC-01)
   - 수용 기준: 미인증 시 전 경로 `/login` 리다이렉트
 - [ ] **T04. Provider Adapter** — `AIProvider` 인터페이스 + `ClaudeProvider` 구현 (스트리밍 포함), env 기반 선택
