@@ -104,10 +104,26 @@
 
 ## Milestone 4 — Handoff (M7)
 
-- [ ] **T16. Handoff 엔진** — CLAUDE.md(필수 5섹션 템플릿)·tasks.md·START_PROMPT 생성, 문서 버전 스냅샷 고정
-  - 수용 기준: 패키지 내 문서가 생성 시점 버전과 일치
-- [ ] **T17. Handoff UI (SC-08)** — 구성 미리보기, zip 다운로드, 프롬프트 복사, 회고 예약 안내
-  - 수용 기준: zip 압축 해제 시 Architecture §5.5 구조와 일치
+- [x] **T16. Handoff 엔진** — CLAUDE.md(필수 5섹션 템플릿)·tasks.md·START_PROMPT 생성, 문서 버전 스냅샷 고정 ✅ 2026-07-05
+  - 수용 기준: 패키지 내 문서가 생성 시점 버전과 일치 — 검증 완료
+    - OTHUB을 discover~engineer 완료 + 6종 문서 approved로 시딩 후 실제 handoff
+      호출 → CLAUDE.md(2342자)·tasks.md(6065자)·START_PROMPT(448자) 생성, doc_version_ids 6개 스냅샷 고정 확인(SQL)
+    - CLAUDE.md가 시딩된 Architecture 문서(플레이스홀더)에 실제 스택 정보가
+      없음을 인식하고 "⚠️ 확정된 스택 정보가 없습니다" 경고를 스스로 남김 —
+      No Guessing(헌법 제6조)이 Handoff 생성에도 적용됨을 실증
+  - 버그 발견·수정: approve API가 phase만 전환하고 documents.status를 approved로
+    바꾸지 않던 누락을 발견 — PHASE_DOC_TYPES 기반으로 승인 시 문서도 approved 전환하도록 수정
+  - src/engine/handoff: buildClaudeMdPrompt/buildTasksPrompt(AI 생성) +
+    buildStartPrompt(결정론적 템플릿, AI 호출 없음 — 프로젝트마다 창의성 불필요), vitest 4 passed
+- [x] **T17. Handoff UI (SC-08)** — 구성 미리보기, zip 다운로드, 프롬프트 복사, 회고 예약 안내 ✅ 2026-07-05
+  - 수용 기준: zip 압축 해제 시 Architecture §5.5 구조와 일치 — 검증 완료
+    - 브라우저 세션 쿠키로 curl 직접 다운로드 → `unzip -l`로 실제 구조 확인:
+      CLAUDE.md · tasks.md · START_PROMPT.md · docs/{PRD,Roadmap,IA,UX,Architecture,API}.md
+      10개 항목 정확히 일치 (jszip 사용)
+    - CLAUDE.md/tasks.md 펼치기 토글, zip 다운로드 링크, 프롬프트 복사 버튼 실동작 확인
+  - vitest 40 passed(누적), 엔진 경계 lint 통과, npm run build 성공
+  - 테스트로 생성된 패키지·문서·context_entries 정리, OTHUB 초기 상태로 리셋
+  - **Milestone 4 완료 — Genesis OS MVP Must 요구사항(M1~M9) 전체 구현 완료**
 
 ## Milestone 5 — 마감 (MVP 완성)
 

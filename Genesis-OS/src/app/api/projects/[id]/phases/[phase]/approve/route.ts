@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { TABLES } from "@/lib/supabase/tables";
 import { assertTransition, nextPhase, PipelineTransitionError } from "@/engine/pipeline";
+import { PHASE_DOC_TYPES } from "@/engine/docgen";
 import type { PhaseName } from "@/types/domain";
 
 const VALID_PHASES: PhaseName[] = ["discover", "define", "design", "engineer", "handoff"];
@@ -68,6 +69,15 @@ export async function POST(
       { error: { code: "UPDATE_FAILED", message: updateError?.message ?? "승인 실패", retryable: true } },
       { status: 500 },
     );
+  }
+
+  const docTypes = PHASE_DOC_TYPES[phase as PhaseName];
+  if (docTypes.length > 0) {
+    await supabase
+      .from(TABLES.documents)
+      .update({ status: "approved" })
+      .eq("project_id", projectId)
+      .in("type", docTypes);
   }
 
   const next = nextPhase(phase as PhaseName);

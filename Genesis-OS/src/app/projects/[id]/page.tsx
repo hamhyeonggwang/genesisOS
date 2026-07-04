@@ -86,10 +86,16 @@ export default async function ProjectHomePage({
 
       {activePhase && (
         <Link
-          href={`/projects/${id}/session/${activePhase}`}
+          href={
+            activePhase === "handoff"
+              ? `/projects/${id}/handoff`
+              : `/projects/${id}/session/${activePhase}`
+          }
           className="rounded-lg border p-4 text-sm hover:bg-muted/50"
         >
-          → {LABELS[activePhase]} 질문 세션 계속하기
+          {activePhase === "handoff"
+            ? "→ Handoff 패키지 생성하기"
+            : `→ ${LABELS[activePhase]} 질문 세션 계속하기`}
         </Link>
       )}
     </main>
