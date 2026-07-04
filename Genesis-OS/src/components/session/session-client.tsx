@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { consumeSseResponse } from "@/lib/parse-sse";
 import { QuestionCard } from "./question-card";
 import { DecisionPanel } from "./decision-panel";
+import { PHASE_DOC_TYPES } from "@/engine/docgen";
+import { Button } from "@/components/ui/button";
 import type { StructuredQuestion } from "@/engine/prompts";
 import type { ContextEntry, PhaseName } from "@/types/domain";
 
@@ -41,8 +43,10 @@ export function SessionClient({
     unresolved: { category: string; question: string }[];
   } | null>(null);
   const [streaming, setStreaming] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
+  const docTypes = PHASE_DOC_TYPES[phase];
 
   async function runTurn(fetchCall: () => Promise<Response>) {
     setStreaming(true);
@@ -88,6 +92,27 @@ export function SessionClient({
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function handleGenerate() {
+    setGenerating(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/phases/${phase}/generate`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setError(body?.error?.message ?? `요청 실패 (${res.status})`);
+        setGenerating(false);
+        return;
+      }
+      await consumeSseResponse(res, () => {});
+      router.push(`/projects/${projectId}`);
+    } catch {
+      setError("네트워크 오류가 발생했습니다.");
+      setGenerating(false);
+    }
+  }
 
   function handleAnswer(answer: string, skipped: boolean) {
     if (!liveQuestion) return;
@@ -197,16 +222,13 @@ export function SessionClient({
                 {phaseComplete.unresolved.map((u) => u.question).join(" / ")}
               </div>
             )}
-            <p className="text-xs text-muted-foreground">
-              문서 생성은 다음 마일스톤(Milestone 3)에서 구현됩니다.
-            </p>
-            <button
-              type="button"
-              onClick={() => router.push(`/projects/${projectId}`)}
-              className="text-xs underline underline-offset-4"
-            >
-              프로젝트 홈으로 돌아가기
-            </button>
+            <Button type="button" disabled={generating} onClick={handleGenerate}>
+              {generating
+                ? "생성 중…"
+                : docTypes.length > 0
+                  ? `🎉 산출물 생성 (${docTypes.length}개 문서)`
+                  : "다음 단계로"}
+            </Button>
           </div>
         )}
       </section>

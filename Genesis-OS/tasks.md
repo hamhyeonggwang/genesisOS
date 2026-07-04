@@ -78,11 +78,29 @@
 
 ## Milestone 3 — 문서 (M5·M6)
 
-- [ ] **T13. Docgen 엔진** — 단계별 문서 생성 (Define→prd·roadmap / Design→ia·ux / Engineer→architecture·api), generate API SSE
-  - 수용 기준: 생성 완료 시 phase=in_review, 문서 원자적 저장
-- [ ] **T14. 문서 뷰/편집 (SC-06)** — Markdown 에디터+프리뷰 2-pane, 저장=새 버전, 버전 드롭다운, 승인 버튼(미정 결정 경고 모달 포함)
-  - 수용 기준: 편집 저장 후 version 증가, source='user_edited'
-- [ ] **T15. Memory 화면 (SC-07)** — 결정 목록·카테고리 필터·검색, Discovery Brief 뷰(discover 카테고리 구조화 표시)
+- [x] **T13. Docgen 엔진** — 단계별 문서 생성 (Define→prd·roadmap / Design→ia·ux / Engineer→architecture·api), generate API SSE ✅ 2026-07-05
+  - 수용 기준: 생성 완료 시 phase=in_review, 문서 원자적 저장 — 검증 완료
+    - OTHUB define 단계(시딩된 confirmed 2건·pending 1건)에서 실제 generate 호출 →
+      PRD(3122자)·Roadmap(4000자) 실제 Claude API로 생성, phase active→in_review 전환 확인
+    - Roadmap이 pending인 `[pricing]`을 전 구간에 걸쳐 명시적으로 플래그하고 PO에게
+      직접 질문까지 남김 — Memory 주입이 문서 생성에도 반영됨을 실증 (헌법 제6조)
+    - discover·handoff(문서 없음)는 즉시 in_review 전환 로직도 코드 리뷰로 확인
+  - src/engine/docgen: PHASE_DOC_TYPES/DOC_TYPE_PHASE 매핑, runDocgen(순차 생성,
+    이전 문서를 상위 문서로 프롬프트에 포함), vitest 6 passed
+  - 버그 아님(오탐): 첫 확인 시 roadmap 버전이 안 보였으나 재조회 결과 정상 존재 —
+    Supabase MCP의 다중 SELECT 배치 조회가 마지막 결과만 반환하는 것으로 확인
+- [x] **T14. 문서 뷰/편집 (SC-06)** — Markdown 에디터+프리뷰 2-pane, 저장=새 버전, 버전 드롭다운, 승인 버튼(미정 결정 경고 모달 포함) ✅ 2026-07-05
+  - 수용 기준: 편집 저장 후 version 증가, source='user_edited' — 검증 완료
+    - PRD 편집→저장 → v2(user_edited, 3155자) 생성 확인(SQL), 버전 드롭다운에 "이전 버전 보는 중" 정확히 표시
+    - 승인 클릭 → "미정 결정이 1건 있습니다" 경고 정확히 표시 → 확인 시 define
+      done 전환 + design active 전환 확인
+  - marked로 Markdown 프리뷰 렌더링, 탭 내비게이션(6종 문서, 미생성 시 반투명)
+- [x] **T15. Memory 화면 (SC-07)** — 결정 목록·카테고리 필터·검색, Discovery Brief 뷰(discover 카테고리 구조화 표시) ✅ 2026-07-05
+  - Discovery Brief 섹션, phase별 그룹화, pending 항목 앰버 강조, 카테고리 필터
+    실동작 확인(브라우저에서 "pricing" 필터 선택 → 해당 항목만 표시)
+  - vitest 36 passed(누적), 엔진 경계 lint 통과, npm run build 성공
+  - 테스트로 생성된 문서·context_entries는 정리, OTHUB은 초기 상태로 리셋
+  - **Milestone 3 (T13~T15) 완료** — Discover~Engineer 승인 시 실제 문서가 AI로 생성되고, 편집·승인·Memory 열람까지 전 과정이 동작
 
 ## Milestone 4 — Handoff (M7)
 

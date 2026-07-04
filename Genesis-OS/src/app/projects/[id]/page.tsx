@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TABLES } from "@/lib/supabase/tables";
 import { PipelineStepper } from "@/components/pipeline-stepper";
+import { PHASE_DOC_TYPES } from "@/engine/docgen";
 import type { PhaseName, PipelinePhase, Project } from "@/types/domain";
 
 const LABELS: Record<PhaseName, string> = {
@@ -47,6 +48,14 @@ export default async function ProjectHomePage({
         </Link>
         <h1 className="text-2xl font-bold tracking-tight">{project.name}</h1>
         <p className="text-sm text-muted-foreground">{project.idea}</p>
+        <nav className="flex gap-3 pt-1 text-xs">
+          <Link href={`/projects/${id}/docs/prd`} className="underline underline-offset-4">
+            문서
+          </Link>
+          <Link href={`/projects/${id}/memory`} className="underline underline-offset-4">
+            Memory
+          </Link>
+        </nav>
       </header>
 
       <section>
@@ -56,14 +65,21 @@ export default async function ProjectHomePage({
       <section className="space-y-3">
         {orderedPhases.map((phase) => {
           const p = byPhase.get(phase);
-          return (
-            <div
-              key={phase}
-              className="flex items-center justify-between rounded-lg border p-3 text-sm"
-            >
+          const docTypes = PHASE_DOC_TYPES[phase];
+          const hasDocs =
+            docTypes.length > 0 && (p?.status === "in_review" || p?.status === "done");
+          const row = (
+            <div className="flex items-center justify-between rounded-lg border p-3 text-sm">
               <span className="font-medium">{LABELS[phase]}</span>
               <span className="text-muted-foreground">{p?.status ?? "locked"}</span>
             </div>
+          );
+          return hasDocs ? (
+            <Link key={phase} href={`/projects/${id}/docs/${docTypes[0]}`} className="block hover:bg-muted/50 rounded-lg">
+              {row}
+            </Link>
+          ) : (
+            <div key={phase}>{row}</div>
           );
         })}
       </section>
