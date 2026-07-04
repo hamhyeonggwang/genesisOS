@@ -38,8 +38,10 @@
 
 ## Milestone 2 — 질문 세션 (M3·M4, 핵심)
 
-- [ ] **T07. Memory 서비스** — `engine/memory`: settle(M1→M2), buildContext(주입 전략 §5.3, 토큰 상한 포함)
-  - 수용 기준: pending 결정이 항상 컨텍스트에 포함됨을 테스트로 보증
+- [x] **T07. Memory 서비스** — `engine/memory`: settle(M1→M2), buildContext(주입 전략 §5.3, 토큰 상한 포함) ✅ 2026-07-05
+  - 수용 기준: pending 결정이 항상 컨텍스트에 포함됨을 테스트로 보증 — 검증 완료 (vitest: tokenLimit=1로도 pending 포함 확인)
+  - 버그 수정: 카테고리에 항목이 1개뿐일 때 압축 요약이 원문 전체를 노출하던 문제 발견·수정 (COMPRESSED_SUMMARY_MAX_CHARS 적용)
+  - vitest 8 passed (settle 4건 + buildContext 3건 + estimateTokens 1건), 엔진 경계 lint 통과
 - [ ] **T08. 프롬프트 체계** — `engine/prompts`: Constitution 조항 내장 시스템 프롬프트(캐싱 접두부), 단계별 질문 세션 템플릿, 구조화 출력 파싱(+1회 재요청 폴백)
   - 수용 기준: 파싱 실패 시 폴백 경로 테스트
 - [ ] **T09. 세션 API** — `session/next`·`session/answer` SSE 스트리밍 (Architecture §5.2 턴 처리 흐름)
