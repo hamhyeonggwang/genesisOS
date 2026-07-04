@@ -42,8 +42,11 @@
   - 수용 기준: pending 결정이 항상 컨텍스트에 포함됨을 테스트로 보증 — 검증 완료 (vitest: tokenLimit=1로도 pending 포함 확인)
   - 버그 수정: 카테고리에 항목이 1개뿐일 때 압축 요약이 원문 전체를 노출하던 문제 발견·수정 (COMPRESSED_SUMMARY_MAX_CHARS 적용)
   - vitest 8 passed (settle 4건 + buildContext 3건 + estimateTokens 1건), 엔진 경계 lint 통과
-- [ ] **T08. 프롬프트 체계** — `engine/prompts`: Constitution 조항 내장 시스템 프롬프트(캐싱 접두부), 단계별 질문 세션 템플릿, 구조화 출력 파싱(+1회 재요청 폴백)
-  - 수용 기준: 파싱 실패 시 폴백 경로 테스트
+- [x] **T08. 프롬프트 체계** — `engine/prompts`: Constitution 조항 내장 시스템 프롬프트(캐싱 접두부), 단계별 질문 세션 템플릿, 구조화 출력 파싱(+1회 재요청 폴백) ✅ 2026-07-05
+  - 수용 기준: 파싱 실패 시 폴백 경로 테스트 — 검증 완료 (vitest: 깨진 응답 → parseStructuredQuestion 실패 → buildRetryInstruction → 재차 실패 → toFreeformFallback이 유효한 구조 생성, is_phase_complete=false 강제 확인)
+  - constitution.ts는 phase/프로젝트와 무관하게 고정 텍스트 유지 (프롬프트 캐싱 전제) — 동일 입력 시 buildSystemPrompt 결과 동일함을 테스트로 고정
+  - vitest 10 passed (parseStructuredQuestion 4건 + 폴백 경로 3건 + buildSystemPrompt 3건), 엔진 경계 lint 통과, npm run build 성공
+  - 실제 AI 호출(재요청 2회 흐름의 실제 실행)은 T09 세션 API에서 provider와 연결해 검증 예정
 - [ ] **T09. 세션 API** — `session/next`·`session/answer` SSE 스트리밍 (Architecture §5.2 턴 처리 흐름)
   - 수용 기준: 답변 → context_entries 정착 → 다음 질문 스트리밍의 왕복 동작
 - [ ] **T10. 세션 UI (SC-05)** — 3-pane 레이아웃, QuestionCard(WHY/WHAT/HOW 접이식·선택지·직접 입력·건너뛰기), 대화 스트림, 키보드 응답(숫자키+Enter)
