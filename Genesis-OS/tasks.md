@@ -60,8 +60,17 @@
   - 인프라 수정: vitest.config.ts 추가 — Vitest 4 기본 tsconfig-paths 해석이 디렉터리 barrel(@/engine/memory 등)을 못 찾는 문제 발견, resolve.alias로 해결 (향후 엔진 간 상호 참조 전체에 적용됨)
   - vitest 30 passed 전체, 엔진 경계 lint 통과, npm run build 성공
   - 테스트로 생성된 context_entries는 정리 완료
-- [ ] **T10. 세션 UI (SC-05)** — 3-pane 레이아웃, QuestionCard(WHY/WHAT/HOW 접이식·선택지·직접 입력·건너뛰기), 대화 스트림, 키보드 응답(숫자키+Enter)
-  - 수용 기준: UX.md F2 루프 전체가 브라우저에서 동작
+- [x] **T10. 세션 UI (SC-05)** — 3-pane 레이아웃, QuestionCard(WHY/WHAT/HOW 접이식·선택지·직접 입력·건너뛰기), 대화 스트림, 키보드 응답(숫자키+Enter) ✅ 2026-07-05
+  - 수용 기준: UX.md F2 루프 전체가 브라우저에서 동작 — 검증 완료 (OTHUB Discover 세션에서 실제 Claude API로 4턴 연속 진행)
+    - QuestionCard: WHY/WHAT/HOW 접이식 토글, 옵션 5~6개(추천 배지), 직접 입력, 숫자키(1~5)로 옵션 선택, Enter로 제출 — 모두 실동작 확인
+    - 답변 확정 → Decision Panel에 confirmed(녹색) 카드 실시간 추가, 다음 질문이 방금 답변을 실제로 참조(예: "반복 작업·비효율" 선택 → "어떤 반복 작업이나 비효율을 겪고 있나요?" 후속 질문)
+    - 건너뛰기 → Decision Panel에 pending(⚠ 앰버) 카드 추가, AI가 임의로 채우지 않고 동일 주제 재질문 (헌법 제6조)
+    - 대화 스트림: 과거 턴이 압축 표시("질문 → 답변" 또는 "⚠ 건너뜀")로 누적, 4턴까지 확인
+  - 구현 컴포넌트: QuestionCard, DecisionPanel, SessionClient(SSE 소비·상태관리), parse-sse.ts(fetch 스트림 파서)
+  - project 홈(SC-04)의 "Milestone 2에서 구현" 플레이스홀더를 실제 세션 링크로 교체
+  - vitest 30 passed(변경 없음), 엔진 경계 lint 통과, npm run build 성공
+  - 테스트로 생성된 context_entries 3건은 정리 완료
+  - **Milestone 2 (T07~T10) 전체 완료 — Genesis OS 질문 세션 핵심 경험 동작**
 - [ ] **T11. Decision Panel** — 실시간 결정 축적, 미정 ⚠ 상단 고정, 결정 수정(PATCH → invalidate+insert)
   - 수용 기준: 수정 시 affects_downstream 배지 표시
 - [ ] **T12. 세션 재개 (F5)** — resume_summary 이벤트, 대시보드 "이어서 하기", 입력 중 답변 로컬 스토리지 보존

@@ -69,9 +69,12 @@ export default async function ProjectHomePage({
       </section>
 
       {activePhase && (
-        <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-          {LABELS[activePhase]} 질문 세션은 다음 마일스톤(Milestone 2)에서 구현됩니다.
-        </p>
+        <Link
+          href={`/projects/${id}/session/${activePhase}`}
+          className="rounded-lg border p-4 text-sm hover:bg-muted/50"
+        >
+          → {LABELS[activePhase]} 질문 세션 계속하기
+        </Link>
       )}
     </main>
   );
