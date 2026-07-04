@@ -1,29 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { QuestionOption, StructuredQuestion } from "@/engine/prompts";
 
+/** F5 재개 시 입력 중이던 답변을 보존한다 (UX.md §7). */
 export function QuestionCard({
   question,
   onAnswer,
   onSkip,
   disabled,
+  draftKey,
 }: {
   question: StructuredQuestion;
   onAnswer: (answer: string) => void;
   onSkip: () => void;
   disabled?: boolean;
+  /** 로컬 스토리지에 초안을 보존할 키 (보통 프로젝트+단계 단위). */
+  draftKey?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [selected, setSelected] = useState<QuestionOption | null>(null);
   const [freeText, setFreeText] = useState("");
 
+  // 마운트 시(클라이언트 전용) 저장된 초안을 복원한다.
+  useEffect(() => {
+    if (!draftKey) return;
+    const draft = window.localStorage.getItem(draftKey);
+    if (draft) setFreeText(draft);
+  }, [draftKey]);
+
+  useEffect(() => {
+    if (!draftKey) return;
+    if (freeText) window.localStorage.setItem(draftKey, freeText);
+    else window.localStorage.removeItem(draftKey);
+  }, [draftKey, freeText]);
+
   const answerValue = freeText.trim() || selected?.label || "";
+
+  function clearDraft() {
+    if (draftKey) window.localStorage.removeItem(draftKey);
+  }
 
   function submit() {
     if (!answerValue || disabled) return;
+    clearDraft();
     onAnswer(answerValue);
   }
 
@@ -140,7 +162,15 @@ export function QuestionCard({
         >
           답변 확정
         </Button>
-        <Button type="button" variant="outline" disabled={disabled} onClick={onSkip}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled}
+          onClick={() => {
+            clearDraft();
+            onSkip();
+          }}
+        >
           건너뛰기
         </Button>
       </div>

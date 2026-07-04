@@ -46,9 +46,12 @@ export function SessionClient({
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
+  const lastAction = useRef<(() => Promise<Response>) | null>(null);
   const docTypes = PHASE_DOC_TYPES[phase];
+  const draftKey = `genesis:draft:${projectId}:${phase}`;
 
   async function runTurn(fetchCall: () => Promise<Response>) {
+    lastAction.current = fetchCall;
     setStreaming(true);
     setError(null);
     try {
@@ -106,7 +109,21 @@ export function SessionClient({
         setGenerating(false);
         return;
       }
-      await consumeSseResponse(res, () => {});
+
+      let streamError: string | null = null;
+      await consumeSseResponse(res, (event) => {
+        if (event.event === "error") {
+          streamError = (event.data.message as string) ?? "생성 중 오류가 발생했습니다.";
+        }
+      });
+
+      if (streamError) {
+        // 이미 생성된 문서는 저장되어 있다 — 다시 누르면 이어서(재시도) 생성한다.
+        setError(`${streamError} 이미 생성된 문서는 저장되었습니다 — 다시 시도하면 이어서 생성합니다.`);
+        setGenerating(false);
+        return;
+      }
+
       router.push(`/projects/${projectId}`);
     } catch {
       setError("네트워크 오류가 발생했습니다.");
@@ -192,8 +209,18 @@ export function SessionClient({
         ))}
 
         {error && (
-          <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive">
-            {error}
+          <div className="space-y-2 rounded-md border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive">
+            <p>{error}</p>
+            {!liveQuestion && !streaming && lastAction.current && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => runTurn(lastAction.current!)}
+              >
+                다시 시도
+              </Button>
+            )}
           </div>
         )}
 
@@ -203,6 +230,7 @@ export function SessionClient({
             onAnswer={(answer) => handleAnswer(answer, false)}
             onSkip={() => handleAnswer("", true)}
             disabled={streaming}
+            draftKey={draftKey}
           />
         )}
 

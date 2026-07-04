@@ -127,8 +127,28 @@
 
 ## Milestone 5 — 마감 (MVP 완성)
 
-- [ ] **T18. 설정 (SC-10 최소)** — Provider 표시·모델 선택, API 키는 env 안내만
-- [ ] **T19. 에러·엣지 상태** — UX.md §7 전체 (빈 상태, 생성 실패 재시도, stale 배지, 경고 모달)
+- [x] **T18. 설정 (SC-10 최소)** — Provider 표시·모델 선택, API 키는 env 안내만 ✅ 2026-07-05
+  - `/settings`: Provider(claude)·Model(claude-sonnet-4-6) 실제 표시 확인, API 키는 미표시
+  - `getProviderConfig()` 추가 (엔진에서 비밀 정보 없이 표시용 설정만 노출)
+  - 대시보드 헤더에 설정 링크 추가 (IA.md 전역 내비게이션)
+- [x] **T19. 에러·엣지 상태** — UX.md §7 전체 (빈 상태, 생성 실패 재시도, stale 배지, 경고 모달) ✅ 2026-07-05
+  - 빈 상태: 대시보드에 예시 아이디어 3개 칩 추가, 클릭 시 `/projects/new?idea=`로 프리필 (브라우저 확인)
+  - 세션 재개: QuestionCard 직접 입력에 localStorage 초안 저장 — 페이지 재진입 후 입력 중이던
+    텍스트 복원 확인(브라우저 E2E), 제출/건너뛰기 시 초안 삭제
+  - 생성 실패 재시도: 세션 질문 생성 실패 시 "다시 시도" 버튼 추가(lastAction ref로 마지막
+    요청 재실행). docgen(산출물 생성) 실패는 이미 부분 저장되어 있어 버튼 재클릭만으로 재시도 가능
+  - stale 배지: DocViewer에 경고 배지 + "재확인" 버튼 추가 — OTHUB에서 실제 reopen→stale
+    전환 후 배지 노출 확인, 재확인 클릭 시 stale→done 전환 확인(브라우저+SQL)
+  - 미정 결정 경고 모달: T14에서 이미 구현·검증 완료
+  - 버그 발견·수정: `handleGenerate`가 SSE `error` 이벤트를 무시하고 무조건 성공 처리하며
+    리다이렉트하던 문제 — 부분 실패 시에도 "성공"으로 오인되는 심각한 버그였음. error 이벤트를
+    감지해 재시도 안내 메시지로 수정
+  - 재설계: UX.md는 stale 상태에 "재생성 또는 무시"를 명시했으나, 실제 파이프라인 상태
+    머신(`ALLOWED.stale = ['done']`)에는 stale→active 전이가 정의되어 있지 않음을 확인.
+    존재하지 않는 전이를 만드는 대신 "재확인"(stale→done, 기존 approve 엔드포인트 재사용)만
+    구현 — 상태 머신과 일치하지 않는 UI를 만들지 않기 위한 의도적 범위 조정
+  - 빌드 버그 수정: `/projects/new`가 `useSearchParams()`를 Suspense 경계 없이 사용해 빌드
+    실패 → Suspense로 래핑
 - [ ] **T20. E2E 검증** — 신규 프로젝트 → 5단계 완주 → zip 다운로드까지 1회 통과 (Playwright)
   - 수용 기준: **Dogfooding 준비 완료** — 이 앱으로 OTHUB Discover 세션을 시작할 수 있다
 

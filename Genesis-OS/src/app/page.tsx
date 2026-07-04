@@ -6,6 +6,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { PipelineStepper } from "@/components/pipeline-stepper";
 import type { PipelinePhase, Project } from "@/types/domain";
 
+const EXAMPLE_IDEAS = [
+  "작업치료사를 위한 교육 플랫폼을 만들고 싶다",
+  "재활 환자의 홈 운동 순응도를 높이는 앱을 만들고 싶다",
+  "임상 노트를 자동으로 요약해주는 도구를 만들고 싶다",
+];
+
 export default async function Home() {
   const supabase = await createClient();
   const {
@@ -41,6 +47,9 @@ export default async function Home() {
         </div>
         {user && (
           <div className="flex items-center gap-3 text-sm">
+            <Link href="/settings" className="text-muted-foreground hover:underline">
+              설정
+            </Link>
             <span className="text-muted-foreground">{user.email}</span>
             <form action={signOut}>
               <Button type="submit" variant="outline" size="sm">
@@ -60,8 +69,19 @@ export default async function Home() {
         </div>
 
         {!projects?.length && (
-          <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            첫 제품을 설계해 보세요.
+          <div className="space-y-3 rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+            <p>첫 제품을 설계해 보세요.</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {EXAMPLE_IDEAS.map((idea) => (
+                <Link
+                  key={idea}
+                  href={`/projects/new?idea=${encodeURIComponent(idea)}`}
+                  className="rounded-full border px-3 py-1 text-xs hover:bg-muted/50"
+                >
+                  {idea}
+                </Link>
+              ))}
+            </div>
           </div>
         )}
 

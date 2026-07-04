@@ -23,6 +23,7 @@ export type CompletionChunk =
 
 export interface AIProvider {
   readonly name: string;
+  readonly model: string;
   stream(req: CompletionRequest): AsyncIterable<CompletionChunk>;
   complete(req: CompletionRequest): Promise<CompletionResult>;
 }

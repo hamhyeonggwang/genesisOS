@@ -6,13 +6,13 @@ import type {
   CompletionResult,
 } from "./types";
 
-const DEFAULT_MODEL = "claude-sonnet-4-6";
+export const DEFAULT_MODEL = "claude-sonnet-4-6";
 const DEFAULT_MAX_TOKENS = 4096;
 
 export class ClaudeProvider implements AIProvider {
   readonly name = "claude";
   private client: Anthropic;
-  private model: string;
+  readonly model: string;
 
   constructor(apiKey: string, model: string = DEFAULT_MODEL) {
     this.client = new Anthropic({ apiKey });

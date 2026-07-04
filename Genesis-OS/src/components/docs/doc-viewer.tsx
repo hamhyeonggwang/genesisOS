@@ -132,13 +132,19 @@ export function DocViewer({
               </Button>
             </>
           )}
-          {phaseStatus === "in_review" && isViewingLatest && (
+          {(phaseStatus === "in_review" || phaseStatus === "stale") && isViewingLatest && (
             <Button type="button" size="sm" disabled={approving} onClick={handleApprove}>
-              {approving ? "승인 중…" : "승인"}
+              {approving ? "처리 중…" : phaseStatus === "stale" ? "재확인" : "승인"}
             </Button>
           )}
         </div>
       </div>
+
+      {phaseStatus === "stale" && (
+        <p className="rounded-md border border-amber-500/50 bg-amber-500/5 p-2 text-xs text-amber-700 dark:text-amber-400">
+          ⚠ 상위 단계가 개정되었습니다 — 이 문서가 여전히 유효한지 검토 후 [재확인]을 눌러주세요.
+        </p>
+      )}
 
       {error && (
         <p className="rounded-md border border-destructive/50 bg-destructive/5 p-2 text-xs text-destructive">
