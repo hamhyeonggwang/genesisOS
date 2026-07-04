@@ -1,15 +1,10 @@
-import type { PhaseName } from "@/types/domain";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { TABLES } from "@/lib/supabase/tables";
 import { signOut } from "@/app/actions/auth";
-import { Button } from "@/components/ui/button";
-
-const PIPELINE: PhaseName[] = [
-  "discover",
-  "define",
-  "design",
-  "engineer",
-  "handoff",
-];
+import { Button, buttonVariants } from "@/components/ui/button";
+import { PipelineStepper } from "@/components/pipeline-stepper";
+import type { PipelinePhase, Project } from "@/types/domain";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -17,38 +12,75 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6">
-      <h1 className="text-4xl font-bold tracking-tight">Genesis OS</h1>
-      <p className="text-muted-foreground">
-        Product Engineering Operating System
-      </p>
-      <ol className="flex gap-2 text-sm">
-        {PIPELINE.map((phase, i) => (
-          <li key={phase} className="flex items-center gap-2">
-            <span className="rounded-full border px-3 py-1 capitalize">
-              {phase}
-            </span>
-            {i < PIPELINE.length - 1 && (
-              <span className="text-muted-foreground">→</span>
-            )}
-          </li>
-        ))}
-      </ol>
-      <p className="text-xs text-muted-foreground">
-        Dogfooding Cycle #1 · T02 Supabase 연결 완료
-      </p>
+  const { data: projects } = await supabase
+    .from(TABLES.projects)
+    .select("*")
+    .order("created_at", { ascending: false })
+    .returns<Project[]>();
 
-      {user && (
-        <div className="flex flex-col items-center gap-2 text-sm">
-          <p className="text-muted-foreground">{user.email}로 로그인됨</p>
-          <form action={signOut}>
-            <Button type="submit" variant="outline" size="sm">
-              로그아웃
-            </Button>
-          </form>
+  const { data: allPhases } = await supabase
+    .from(TABLES.projectPhases)
+    .select("*")
+    .returns<PipelinePhase[]>();
+
+  const phasesByProject = new Map<string, PipelinePhase[]>();
+  for (const phase of allPhases ?? []) {
+    const list = phasesByProject.get(phase.project_id) ?? [];
+    list.push(phase);
+    phasesByProject.set(phase.project_id, list);
+  }
+
+  return (
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-8 p-8">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Genesis OS</h1>
+          <p className="text-sm text-muted-foreground">
+            Product Engineering Operating System
+          </p>
         </div>
-      )}
+        {user && (
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-muted-foreground">{user.email}</span>
+            <form action={signOut}>
+              <Button type="submit" variant="outline" size="sm">
+                로그아웃
+              </Button>
+            </form>
+          </div>
+        )}
+      </header>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">프로젝트</h2>
+          <Link href="/projects/new" className={buttonVariants({ size: "sm" })}>
+            + 새 프로젝트
+          </Link>
+        </div>
+
+        {!projects?.length && (
+          <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+            첫 제품을 설계해 보세요.
+          </div>
+        )}
+
+        <div className="grid gap-3">
+          {projects?.map((project) => (
+            <Link
+              key={project.id}
+              href={`/projects/${project.id}`}
+              className="rounded-lg border p-4 transition-colors hover:bg-muted/50"
+            >
+              <p className="mb-2 font-medium">{project.name}</p>
+              <PipelineStepper
+                phases={phasesByProject.get(project.id) ?? []}
+                compact
+              />
+            </Link>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

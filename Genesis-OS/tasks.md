@@ -26,10 +26,15 @@
 
 ## Milestone 1 — 프로젝트 & 파이프라인 (M1·M2)
 
-- [ ] **T05. 프로젝트 CRUD** — `POST /api/projects` (5 phase 초기화 포함), 대시보드 SC-02 (목록·단계 현황), SC-03 생성 폼
-  - 수용 기준: 생성 직후 discover=active, 나머지 locked
-- [ ] **T06. 파이프라인 상태 머신** — `engine/pipeline` 전이 로직 + approve/reopen API, PipelineStepper 컴포넌트, SC-04 프로젝트 홈
-  - 수용 기준: 허용되지 않은 전이는 400 INVALID_TRANSITION, reopen 시 하위 단계 stale 전환
+- [x] **T05. 프로젝트 CRUD** — `POST /api/projects` (5 phase 초기화 포함), 대시보드 SC-02 (목록·단계 현황), SC-03 생성 폼 ✅ 2026-07-04
+  - 수용 기준: 생성 직후 discover=active, 나머지 locked — 검증 완료 (브라우저에서 OTHUB 프로젝트 실제 생성, 화면에서 discover=active/나머지=locked 확인)
+- [x] **T06. 파이프라인 상태 머신** — `engine/pipeline` 전이 로직 + approve/reopen API, PipelineStepper 컴포넌트, SC-04 프로젝트 홈 ✅ 2026-07-04
+  - 수용 기준: 허용되지 않은 전이는 400 INVALID_TRANSITION, reopen 시 하위 단계 stale 전환 — 검증 완료
+    - active 상태에서 approve 시도 → 400 INVALID_TRANSITION 확인
+    - in_review→done 정상 승인 + 다음 단계 active 전환 확인 (discover→define, define→design)
+    - done 상태 phase reopen → active 복귀 + 하위 done 단계 stale 전환 확인 (discover reopen 시 define이 stale로)
+    - active 상태 phase reopen 시도 → 400 INVALID_TRANSITION 확인
+    - vitest 4 passed (pipeline 상태 머신 단위 테스트)
 
 ## Milestone 2 — 질문 세션 (M3·M4, 핵심)
 
