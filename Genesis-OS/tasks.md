@@ -19,8 +19,10 @@
 - [x] **T03. 인증** — Supabase Auth 이메일 로그인, 미들웨어 세션 검증, `/login` (SC-01) ✅ 2026-07-04
   - 수용 기준: 미인증 시 전 경로 `/login` 리다이렉트 — 검증 완료 (브라우저에서 미인증→/login, 로그인→/, 인증 상태에서 /login 접근→/, 로그아웃→/login 전체 왕복 확인)
   - 버그 수정: `middleware.ts`는 `src/` 디렉토리 프로젝트에서 `src/middleware.ts`에 있어야 함 (Next.js 컨벤션, 초기에 루트에 둬서 무시되던 것을 발견·수정)
-- [ ] **T04. Provider Adapter** — `AIProvider` 인터페이스 + `ClaudeProvider` 구현 (스트리밍 포함), env 기반 선택
-  - 수용 기준: 단위 테스트에서 mock provider로 교체 가능
+- [x] **T04. Provider Adapter** — `AIProvider` 인터페이스 + `ClaudeProvider` 구현 (스트리밍 포함), env 기반 선택 ✅ 2026-07-04
+  - 수용 기준: 단위 테스트에서 mock provider로 교체 가능 — 검증 완료 (vitest 2 passed: MockProvider 실행 + ClaudeProvider 타입 호환)
+  - 추가 검증: 임시 API 라우트로 실제 Claude API 스트리밍 호출 성공 확인 후 라우트 제거 (`{"provider":"claude","text":"genesis-os-smoke-ok","stopReason":"end_turn"}`)
+  - 발견: Next.js는 `_`로 시작하는 폴더를 라우팅에서 제외(private folder 컨벤션) — 임시 라우트 경로 조정하며 확인
 
 ## Milestone 1 — 프로젝트 & 파이프라인 (M1·M2)
 
