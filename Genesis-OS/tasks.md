@@ -16,8 +16,9 @@
 - [x] **T02. Supabase 셋업** — 기존 프로젝트(`ruxbuidhvodnfztrdwvf`)에 `genesis_` 접두사로 스키마 분리 적용, DDL 마이그레이션, 전 테이블 RLS ✅ 2026-07-04
   - 수용 기준: 전 9개 테이블 RLS 활성화 확인, 보안 어드바이저 실행 후 함수 search_path 이슈 수정 완료
   - 참고: 원래 신규 프로젝트 생성을 상정했으나 기존 공유 프로젝트 사용으로 변경 (Architecture.md §7.1에 결정 기록)
-- [ ] **T03. 인증** — Supabase Auth 이메일 로그인, 미들웨어 세션 검증, `/login` (SC-01)
-  - 수용 기준: 미인증 시 전 경로 `/login` 리다이렉트
+- [x] **T03. 인증** — Supabase Auth 이메일 로그인, 미들웨어 세션 검증, `/login` (SC-01) ✅ 2026-07-04
+  - 수용 기준: 미인증 시 전 경로 `/login` 리다이렉트 — 검증 완료 (브라우저에서 미인증→/login, 로그인→/, 인증 상태에서 /login 접근→/, 로그아웃→/login 전체 왕복 확인)
+  - 버그 수정: `middleware.ts`는 `src/` 디렉토리 프로젝트에서 `src/middleware.ts`에 있어야 함 (Next.js 컨벤션, 초기에 루트에 둬서 무시되던 것을 발견·수정)
 - [ ] **T04. Provider Adapter** — `AIProvider` 인터페이스 + `ClaudeProvider` 구현 (스트리밍 포함), env 기반 선택
   - 수용 기준: 단위 테스트에서 mock provider로 교체 가능
 

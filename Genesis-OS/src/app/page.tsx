@@ -1,4 +1,7 @@
 import type { PhaseName } from "@/types/domain";
+import { createClient } from "@/lib/supabase/server";
+import { signOut } from "@/app/actions/auth";
+import { Button } from "@/components/ui/button";
 
 const PIPELINE: PhaseName[] = [
   "discover",
@@ -8,7 +11,12 @@ const PIPELINE: PhaseName[] = [
   "handoff",
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6">
       <h1 className="text-4xl font-bold tracking-tight">Genesis OS</h1>
@@ -28,8 +36,19 @@ export default function Home() {
         ))}
       </ol>
       <p className="text-xs text-muted-foreground">
-        Dogfooding Cycle #1 · T01 scaffolding complete
+        Dogfooding Cycle #1 · T02 Supabase 연결 완료
       </p>
+
+      {user && (
+        <div className="flex flex-col items-center gap-2 text-sm">
+          <p className="text-muted-foreground">{user.email}로 로그인됨</p>
+          <form action={signOut}>
+            <Button type="submit" variant="outline" size="sm">
+              로그아웃
+            </Button>
+          </form>
+        </div>
+      )}
     </main>
   );
 }
