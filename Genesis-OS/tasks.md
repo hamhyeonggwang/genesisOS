@@ -149,8 +149,23 @@
     구현 — 상태 머신과 일치하지 않는 UI를 만들지 않기 위한 의도적 범위 조정
   - 빌드 버그 수정: `/projects/new`가 `useSearchParams()`를 Suspense 경계 없이 사용해 빌드
     실패 → Suspense로 래핑
-- [ ] **T20. E2E 검증** — 신규 프로젝트 → 5단계 완주 → zip 다운로드까지 1회 통과 (Playwright)
-  - 수용 기준: **Dogfooding 준비 완료** — 이 앱으로 OTHUB Discover 세션을 시작할 수 있다
+- [x] **T20. E2E 검증** — 신규 프로젝트 → Discover 세션 첫 질문 로딩까지 Playwright 스모크 테스트 (PO 승인 범위 조정) ✅ 2026-07-05
+  - 수용 기준: **Dogfooding 준비 완료** — 이 앱으로 OTHUB Discover 세션을 시작할 수 있다 — 검증 완료
+  - **범위 조정 (PO 승인)**: tasks.md 원안은 "5단계 완주→zip까지 1회 통과"였으나, 실제 Claude
+    API로 멀티턴 대화 5단계를 매 실행마다 자동화하면 수 분·수 달러 비용과 LLM 응답의
+    비결정성으로 자동화 회귀 테스트에 부적합함을 PO와 상의 후 확인. 대신:
+    1. `src/engine/provider/mock.ts` MockProvider 추가 (GENESIS_AI_PROVIDER=mock,
+       프로덕션 미사용) — 결정론적 고정 응답으로 화면 배선만 빠르게 검증
+    2. Playwright로 로그인→새 프로젝트 생성→Discover 세션 첫 질문 로딩→답변 제출→
+       Decision Panel 갱신까지 스모크 테스트 (`e2e/smoke.spec.ts`)
+    3. 전체 5단계·문서 생성·Handoff·zip 다운로드는 이 개발 세션에서 실제 Claude API로
+       반복적으로 브라우저 E2E 검증 완료 (T05~T17 커밋 기록 참고) — 이것이 실질적인
+       "Dogfooding 준비 완료"의 근거
+  - `npm run test:e2e` 1회 통과 확인 (재현 가능 — playwright.config.ts가 .env.local을
+    자동 로드하도록 구현)
+  - 버그 수정: vitest가 `e2e/**`를 자체 테스트로 오인해 실행 실패 → vitest.config.ts에서 제외
+  - 테스트로 생성된 "E2E Smoke *" 프로젝트는 정리 완료
+  - **Milestone 5 완료 — Genesis OS MVP 전체(Must) 완성**
 
 ## Milestone S — Should (MVP 여력 시)
 

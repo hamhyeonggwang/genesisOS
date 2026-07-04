@@ -2,10 +2,12 @@
 // 서버 전용 env만 참조 — 이 모듈은 API Route에서만 호출된다.
 
 import { ClaudeProvider, DEFAULT_MODEL } from "./claude";
+import { MockProvider } from "./mock";
 import type { AIProvider } from "./types";
 
 export type { AIProvider, CompletionRequest, CompletionResult, CompletionChunk } from "./types";
 export { ClaudeProvider } from "./claude";
+export { MockProvider } from "./mock";
 
 let cached: AIProvider | null = null;
 
@@ -21,6 +23,11 @@ export function getProvider(): AIProvider {
         throw new Error("ANTHROPIC_API_KEY is not set");
       }
       cached = new ClaudeProvider(apiKey, process.env.GENESIS_AI_MODEL);
+      return cached;
+    }
+    // T20 E2E 스모크 테스트 전용 — 프로덕션에서는 절대 설정하지 말 것.
+    case "mock": {
+      cached = new MockProvider();
       return cached;
     }
     default:

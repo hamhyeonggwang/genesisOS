@@ -10,4 +10,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  test: {
+    // e2e/는 Playwright 전용 (T20) — vitest 기본 글롭(**/*.spec.ts)과 겹쳐 제외한다.
+    exclude: ["**/node_modules/**", "**/e2e/**"],
+  },
 });
