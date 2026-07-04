@@ -47,8 +47,19 @@
   - constitution.ts는 phase/프로젝트와 무관하게 고정 텍스트 유지 (프롬프트 캐싱 전제) — 동일 입력 시 buildSystemPrompt 결과 동일함을 테스트로 고정
   - vitest 10 passed (parseStructuredQuestion 4건 + 폴백 경로 3건 + buildSystemPrompt 3건), 엔진 경계 lint 통과, npm run build 성공
   - 실제 AI 호출(재요청 2회 흐름의 실제 실행)은 T09 세션 API에서 provider와 연결해 검증 예정
-- [ ] **T09. 세션 API** — `session/next`·`session/answer` SSE 스트리밍 (Architecture §5.2 턴 처리 흐름)
-  - 수용 기준: 답변 → context_entries 정착 → 다음 질문 스트리밍의 왕복 동작
+- [x] **T09. 세션 API** — `session/next`·`session/answer` SSE 스트리밍 (Architecture §5.2 턴 처리 흐름) ✅ 2026-07-05
+  - 수용 기준: 답변 → context_entries 정착 → 다음 질문 스트리밍의 왕복 동작 — 검증 완료 (OTHUB 프로젝트에서 실제 Claude API로 브라우저 E2E)
+    - session/next: 실제 스트리밍으로 구조화 질문 생성 (question_delta → question), Discover 단계 첫 질문 정상 생성
+    - session/answer: 답변 제출 → context_entries에 confirmed로 정착 확인(SQL) → 다음 질문이 방금 답변 내용을 실제로 참조함을 확인 (Memory 주입 실증)
+    - skipped:true → pending 상태로 정착, AI가 임의로 채우지 않고 동일 질문 재확인 (헌법 제6조)
+    - 결정 존재 상태에서 session/next 재호출 → resume_summary 이벤트 정상 발생
+    - locked phase에서 세션 시도 → 400 INVALID_TRANSITION 확인
+  - src/engine/session: runTurn(스트리밍→파싱→재요청→폴백), buildResumeSummary
+  - 구현 결정: API.md의 session/answer 요청 스키마를 {question_id}→{question,category}로 수정 (대기 질문 저장 테이블 부재로 인한 실용적 조정, API.md에 결정 기록)
+  - 버그 발견·수정: TypeScript가 클로저 내부에서 isValidPhase 타입가드 좁히기를 유지하지 못함 → 좁혀진 타입을 별도 변수(phase: PhaseName)에 명시 할당
+  - 인프라 수정: vitest.config.ts 추가 — Vitest 4 기본 tsconfig-paths 해석이 디렉터리 barrel(@/engine/memory 등)을 못 찾는 문제 발견, resolve.alias로 해결 (향후 엔진 간 상호 참조 전체에 적용됨)
+  - vitest 30 passed 전체, 엔진 경계 lint 통과, npm run build 성공
+  - 테스트로 생성된 context_entries는 정리 완료
 - [ ] **T10. 세션 UI (SC-05)** — 3-pane 레이아웃, QuestionCard(WHY/WHAT/HOW 접이식·선택지·직접 입력·건너뛰기), 대화 스트림, 키보드 응답(숫자키+Enter)
   - 수용 기준: UX.md F2 루프 전체가 브라우저에서 동작
 - [ ] **T11. Decision Panel** — 실시간 결정 축적, 미정 ⚠ 상단 고정, 결정 수정(PATCH → invalidate+insert)

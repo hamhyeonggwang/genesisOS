@@ -54,9 +54,14 @@
 
 #### `POST /api/projects/:id/phases/:phase/session/answer`
 답변 제출 → 결정 정착 → 다음 질문 스트리밍 (위와 동일한 SSE).
+
+> **구현 결정 (T09):** 별도의 "대기 중 질문" 저장 테이블이 없어 `question_id`만으로는
+> 서버가 원문 질문을 복원할 수 없다. 클라이언트가 방금 받은 `question`/`category`를
+> 그대로 되돌려주는 방식으로 확정한다 (Architecture.md §5.2 `settle()` 입력과 1:1 대응).
+
 ```jsonc
-{ "question_id": "q_...", "answer": "MVP는 나만...", "skipped": false }
-// skipped: true → context_entries에 status: 'pending'으로 기록
+{ "question": "MVP 사용자는 누구입니까?", "category": "users", "answer": "MVP는 나만...", "skipped": false }
+// skipped: true → context_entries에 status: 'pending'으로 기록 (answer는 무시됨)
 ```
 
 ### 결정 (Decision Panel)
