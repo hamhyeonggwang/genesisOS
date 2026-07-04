@@ -4,7 +4,7 @@
 |---|---|
 | 문서 버전 | v1.0 |
 | 작성일 | 2026-07-04 |
-| 상위 문서 | [Architecture.md](Architecture.md) · [API.md](API.md) |
+| 상위 문서 | [Architecture.md](docs/Architecture.md) · [API.md](docs/API.md) |
 | 원칙 | 마일스톤 순서 = 의존성 순서. 각 마일스톤 끝에서 동작하는 상태를 유지한다. |
 
 ---
