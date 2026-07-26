@@ -47,3 +47,15 @@ supabase/migrations/*.sql.backup
 # Build artifacts
 *.pyc
 __pycache__/
+
+# Independent git repos embedded in the domain structure
+# (each has its own .git — tracked separately, not as part of this repo)
+Clinical/projects/icf-coding-app/
+Design/projects/clinical-system-portfolio/
+Development/projects/i-can-do-adl/
+
+# Too large for git — kept locally outside this repo
+OTwiki/
+
+# Vector store binaries (regenerable)
+Development/projects/rag/.chroma/

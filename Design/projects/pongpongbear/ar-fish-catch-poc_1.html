@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>바닷속 물고기 잡기 · AR 게임 POC</title>
+<style>
+  :root{ --bg:#0a1a22; --ink:#F5F0E8; --teal:#2A9D8F; --teal-d:#1f7a70; --coral:#e76f51; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);
+    font-family:-apple-system,"Pretendard","Noto Sans KR",sans-serif;color:var(--ink);
+    touch-action:none;user-select:none;}
+  #stage{position:fixed;inset:0;}
+  #cam{position:absolute;inset:0;width:1px;height:1px;opacity:0;pointer-events:none;} /* 소스 전용 */
+  #scene{position:absolute;inset:0;}
+
+  #gate,#loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:16px;padding:28px;text-align:center;
+    background:radial-gradient(circle at 50% 35%,#12303b,#07161d);z-index:5;}
+  #loading{display:none;}
+  h1{font-size:20px;margin:0;font-weight:700;}
+  #gate p{margin:0;font-size:13px;line-height:1.6;opacity:.8;max-width:300px;}
+  .btn{appearance:none;border:none;border-radius:20px;padding:14px 24px;font-size:15px;
+    font-weight:600;background:var(--teal);color:#fff;box-shadow:0 6px 18px rgba(42,157,143,.4);
+    cursor:pointer;transition:.15s;}
+  .btn:active{transform:scale(.96);background:var(--teal-d);}
+  .spin{width:38px;height:38px;border:4px solid rgba(245,240,232,.2);border-top-color:var(--teal);
+    border-radius:50%;animation:sp 1s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+
+  /* 상단 스코어 */
+  #top{position:absolute;top:calc(10px + env(safe-area-inset-top));left:0;right:0;display:none;
+    justify-content:space-between;align-items:center;padding:0 16px;z-index:3;}
+  .stat{background:rgba(7,22,29,.55);border-radius:14px;padding:7px 14px;font-weight:700;font-size:15px;
+    backdrop-filter:blur(4px);}
+  .stat small{font-weight:500;opacity:.7;font-size:11px;}
+
+  /* 하단 컨트롤 */
+  #hud{position:absolute;left:0;right:0;bottom:0;display:none;flex-direction:column;gap:10px;
+    padding:12px 14px calc(14px + env(safe-area-inset-bottom));z-index:3;
+    background:linear-gradient(to top,rgba(7,22,29,.85),transparent);}
+  .row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .chip{font-size:12px;font-weight:600;padding:9px 13px;border-radius:14px;
+    background:rgba(245,240,232,.12);color:var(--ink);border:1px solid rgba(245,240,232,.15);
+    cursor:pointer;transition:.15s;white-space:nowrap;}
+  .chip.on{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .chip:active{transform:scale(.95);}
+  #file{display:none;}
+  #err{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);font-size:12px;
+    background:rgba(231,111,81,.85);padding:8px 14px;border-radius:12px;display:none;z-index:4;max-width:88%;text-align:center;}
+</style>
+</head>
+<body>
+<div id="stage">
+  <video id="cam" playsinline autoplay muted></video>
+  <canvas id="scene"></canvas>
+
+  <div id="top">
+    <div class="stat"><small>점수</small> <span id="score">0</span></div>
+    <div class="stat"><small>남은시간</small> <span id="time">60</span>s</div>
+  </div>
+
+  <div id="err"></div>
+
+  <!-- 시작 게이트 -->
+  <div id="gate">
+    <h1>🐟 물고기 잡기 <span style="opacity:.5;font-weight:400;font-size:13px;">AR 게임 POC</span></h1>
+    <p>화면 속 손을 뻗어 헤엄치는 물고기를 잡으세요.<br><b>정밀</b> 모드는 엄지+검지 핀치, <b>쉬움</b> 모드는 손끝 터치로 잡힙니다.</p>
+    <button class="btn" id="startBtn">게임 시작</button>
+    <p style="font-size:11px;opacity:.5;">전면 카메라 + 손 인식. HTTPS 필요. 첫 실행 시 AI 모델 다운로드로 수 초 걸립니다.</p>
+  </div>
+  <!-- 로딩 -->
+  <div id="loading"><div class="spin"></div><p style="font-size:13px;opacity:.8;">손 인식 모델 불러오는 중…</p></div>
+
+  <!-- 하단 컨트롤 -->
+  <div id="hud">
+    <div class="row">
+      <label class="chip" for="file">📷 물고기 그림</label>
+      <button class="chip on" id="tPinch">정밀(핀치)</button>
+      <button class="chip"    id="tTouch">쉬움(터치)</button>
+      <button class="chip on" id="tSkel">손 스켈레톤</button>
+      <button class="chip" id="restart">↻ 다시</button>
+    </div>
+  </div>
+  <input type="file" id="file" accept="image/*" />
+</div>
+
+<script type="module">
+/* ============================================================
+   바닷속 물고기 잡기 · AR 게임 POC
+   스택: getUserMedia(전면) + Canvas2D + MediaPipe HandLandmarker(tasks-vision)
+   검증: 셀피 수조에서 손 인식으로 "잡는" 상호작용이 성립하는가 (핀치/터치)
+   OT: 난이도 그레이딩 — 정밀(핀치=precision grip) / 쉬움(손끝 터치)
+   손 랜드마크: 21점, 정규화[0,1]. 엄지끝=4 검지끝=8 손목=0 중지MCP=9
+   ============================================================ */
+import { FilesetResolver, HandLandmarker }
+  from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs";
+  // 프로덕션에선 버전 고정 권장(예: @mediapipe/tasks-vision@0.10.x). latest=최신.
+
+const video=document.getElementById('cam');
+const canvas=document.getElementById('scene');
+const ctx=canvas.getContext('2d');
+const gate=document.getElementById('gate');
+const loading=document.getElementById('loading');
+const hud=document.getElementById('hud');
+const top=document.getElementById('top');
+const errBox=document.getElementById('err');
+const scoreEl=document.getElementById('score');
+const timeEl=document.getElementById('time');
+
+const G={
+  sprite:null, mode:'pinch',           // 'pinch' | 'touch'
+  skel:true, camReady:false, hand:null, landmarker:null,
+  fish:[], bub:[], caustics:[],
+  score:0, time:60, running:false, t0:performance.now(), lastVT:-1,
+  cool:0, particles:[]
+};
+
+/* ── 캔버스 리사이즈 ─────────────────────────────────── */
+function resize(){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=innerWidth*dpr; canvas.height=innerHeight*dpr;
+  canvas.style.width=innerWidth+'px'; canvas.style.height=innerHeight+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+/* ── 기본 물고기 스프라이트(오른쪽 봄) ───────────────── */
+function makeFish(){
+  const w=180,h=110,c=document.createElement('canvas'); c.width=w;c.height=h;
+  const g=c.getContext('2d');
+  g.fillStyle='#e76f51';
+  g.beginPath();g.moveTo(38,55);g.lineTo(6,26);g.lineTo(16,55);g.lineTo(6,84);g.closePath();g.fill();
+  g.fillStyle='#2A9D8F'; g.beginPath();g.ellipse(96,55,58,34,0,0,7);g.fill();
+  g.fillStyle='rgba(245,240,232,.35)'; g.beginPath();g.ellipse(100,68,44,16,0,0,7);g.fill();
+  g.fillStyle='#1f7a70'; g.beginPath();g.moveTo(92,24);g.quadraticCurveTo(110,6,124,26);g.closePath();g.fill();
+  g.fillStyle='#fff'; g.beginPath();g.arc(136,46,11,0,7);g.fill();
+  g.fillStyle='#0a1a22'; g.beginPath();g.arc(139,46,5,0,7);g.fill();
+  return c;
+}
+const defaultFish=makeFish();
+
+/* ── 물고기/버블/코스틱 ──────────────────────────────── */
+function spawnFish(n){
+  G.fish=[];
+  for(let i=0;i<n;i++) G.fish.push(newFish());
+}
+function newFish(){
+  const fromLeft=Math.random()<.5;
+  return { x:fromLeft?-0.1:1.1, y:0.2+Math.random()*0.55, z:0.5+Math.random()*0.7,
+           dir:fromLeft?1:-1, spd:0.03+Math.random()*0.04, wob:Math.random()*7,
+           tnext:2+Math.random()*4, caught:false, scale:1, alive:true };
+}
+spawnFish(6);
+G.bub=Array.from({length:24},()=>({x:Math.random(),y:Math.random(),r:2+Math.random()*5,spd:0.05+Math.random()*0.12,wob:Math.random()*7}));
+G.caustics=Array.from({length:4},()=>({x:Math.random(),y:Math.random(),r:120+Math.random()*120,vx:(Math.random()-.5)*0.02,vy:(Math.random()-.5)*0.02}));
+
+/* ── 시작: 전면 카메라 → MediaPipe 로드 ──────────────── */
+async function start(){
+  gate.style.display='none'; loading.style.display='flex';
+  // 1) 전면 카메라
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user', width:{ideal:1280}, height:{ideal:720}}, audio:false });
+    video.srcObject=stream; await video.play(); G.camReady=true;
+  }catch(e){ showErr('카메라를 열 수 없습니다: '+e.message); }
+
+  // 2) HandLandmarker 로드
+  try{
+    const vision=await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm");
+    G.landmarker=await HandLandmarker.createFromOptions(vision,{
+      baseOptions:{
+        modelAssetPath:"https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+        delegate:"GPU"
+      },
+      numHands:1, runningMode:"VIDEO"
+    });
+  }catch(e){ showErr('손 인식 로드 실패(네트워크?): '+e.message); }
+
+  loading.style.display='none'; hud.style.display='flex'; top.style.display='flex';
+  G.running=true; G.t0=performance.now();
+  startTimer();
+}
+document.getElementById('startBtn').addEventListener('click',start,{once:true});
+
+function showErr(m){ errBox.textContent=m; errBox.style.display='block';
+  setTimeout(()=>errBox.style.display='none',5000); }
+
+/* ── 라운드 타이머(60s) ──────────────────────────────── */
+let timerId=null;
+function startTimer(){
+  clearInterval(timerId); G.time=60; timeEl.textContent=G.time;
+  timerId=setInterval(()=>{
+    if(!G.running) return;
+    G.time--; timeEl.textContent=Math.max(0,G.time);
+    if(G.time<=0){ G.running=false; clearInterval(timerId); showErr('끝! 점수 '+G.score+'점'); }
+  },1000);
+}
+document.getElementById('restart').addEventListener('click',()=>{
+  G.score=0; scoreEl.textContent=0; spawnFish(6); G.running=true; startTimer();
+});
+
+/* ── 컨트롤 ──────────────────────────────────────────── */
+const cP=document.getElementById('tPinch'), cT=document.getElementById('tTouch');
+cP.addEventListener('click',()=>{G.mode='pinch';cP.classList.add('on');cT.classList.remove('on');});
+cT.addEventListener('click',()=>{G.mode='touch';cT.classList.add('on');cP.classList.remove('on');});
+const cS=document.getElementById('tSkel');
+cS.addEventListener('click',()=>{G.skel=!G.skel;cS.classList.toggle('on',G.skel);});
+
+document.getElementById('file').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const img=new Image();
+  img.onload=()=>{
+    const max=360,r=Math.min(1,max/Math.max(img.width,img.height));
+    const c=document.createElement('canvas'); c.width=img.width*r; c.height=img.height*r;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    G.sprite=removeBackground(c);
+  };
+  img.src=URL.createObjectURL(f);
+});
+function removeBackground(src){
+  const w=src.width,h=src.height,c=document.createElement('canvas');
+  c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(src,0,0);
+  const im=g.getImageData(0,0,w,h),d=im.data,cor=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+  let br=0,bg=0,bb=0;for(const[x,y]of cor){const i=(y*w+x)*4;br+=d[i];bg+=d[i+1];bb+=d[i+2];}
+  br/=4;bg/=4;bb/=4;const T=60;
+  const near=i=>Math.abs(d[i]-br)<T&&Math.abs(d[i+1]-bg)<T&&Math.abs(d[i+2]-bb)<T;
+  const st=[],seen=new Uint8Array(w*h);for(const[x,y]of cor)st.push(y*w+x);
+  while(st.length){const p=st.pop();if(seen[p])continue;seen[p]=1;const i=p*4;if(!near(i))continue;
+    d[i+3]=0;const x=p%w,y=(p/w)|0;
+    if(x>0)st.push(p-1);if(x<w-1)st.push(p+1);if(y>0)st.push(p-w);if(y<h-1)st.push(p+w);}
+  g.putImageData(im,0,0);return c;
+}
+
+/* ── cover 매핑 헬퍼(영상+랜드마크 좌표 일치) ───────── */
+function coverParams(){
+  const W=innerWidth,H=innerHeight,vw=video.videoWidth||16,vh=video.videoHeight||9;
+  const s=Math.max(W/vw,H/vh),dw=vw*s,dh=vh*s;
+  return {W,H,dw,dh,ox:(W-dw)/2,oy:(H-dh)/2};
+}
+// 랜드마크(정규화 nx,ny) → 화면 픽셀. 셀피 미러: mx=1-nx
+function lm2screen(nx,ny){
+  const {dw,dh,ox,oy}=coverParams();
+  return { x:ox+(1-nx)*dw, y:oy+ny*dh };
+}
+
+/* ── 카메라(미러) 그리기 ─────────────────────────────── */
+function drawCam(){
+  if(!G.camReady||video.videoWidth===0){
+    const g=ctx.createLinearGradient(0,0,0,innerHeight);
+    g.addColorStop(0,'#123642');g.addColorStop(1,'#07161d');
+    ctx.fillStyle=g;ctx.fillRect(0,0,innerWidth,innerHeight);return;
+  }
+  const {dw,dh,ox,oy}=coverParams();
+  ctx.save(); ctx.translate(innerWidth,0); ctx.scale(-1,1);   // 셀피 미러
+  ctx.drawImage(video,ox,oy,dw,dh);
+  ctx.restore();
+}
+
+/* ── 언더워터 FX ─────────────────────────────────────── */
+function drawSea(t){
+  const g=ctx.createRadialGradient(innerWidth/2,innerHeight*0.4,innerHeight*0.2,
+    innerWidth/2,innerHeight*0.5,innerHeight*0.9);
+  g.addColorStop(0,'rgba(20,120,150,0.15)');g.addColorStop(1,'rgba(6,30,45,0.42)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,innerWidth,innerHeight);
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const c of G.caustics){
+    c.x+=c.vx;c.y+=c.vy;if(c.x<0||c.x>1)c.vx*=-1;if(c.y<0||c.y>1)c.vy*=-1;
+    const px=c.x*innerWidth,py=c.y*innerHeight;
+    const rg=ctx.createRadialGradient(px,py,0,px,py,c.r);
+    const a=0.045+0.025*Math.sin(t*0.8+c.x*10);
+    rg.addColorStop(0,`rgba(120,220,230,${a})`);rg.addColorStop(1,'rgba(120,220,230,0)');
+    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(px,py,c.r,0,7);ctx.fill();
+  }
+  ctx.restore();
+}
+function drawBubbles(dt){
+  ctx.save();
+  for(const b of G.bub){
+    b.y-=b.spd*dt;if(b.y<-0.03){b.y=1.03;b.x=Math.random();}
+    const px=(b.x+0.02*Math.sin(b.y*10+b.wob))*innerWidth,py=b.y*innerHeight;
+    ctx.beginPath();ctx.arc(px,py,b.r,0,7);
+    ctx.fillStyle='rgba(200,240,255,0.16)';ctx.fill();
+    ctx.strokeStyle='rgba(220,250,255,0.28)';ctx.lineWidth=1;ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ── 물고기 헤엄 + 화면좌표 저장(잡기 판정용) ─────────── */
+function updateFish(t,dt){
+  const spr=G.sprite||defaultFish;
+  for(const f of G.fish){
+    if(!f.alive) continue;
+    if(f.caught){                       // 잡힌 연출: 축소 후 리스폰
+      f.scale-=dt*2.5;
+      if(f.scale<=0){ Object.assign(f,newFish()); }
+      continue;
+    }
+    f.tnext-=dt; if(f.tnext<=0){ f.dir*=(Math.random()<.35?-1:1); f.tnext=2+Math.random()*4; }
+    f.x+=f.dir*f.spd*dt*(1/f.z);
+    if(f.x<-0.15)f.x=1.15; if(f.x>1.15)f.x=-0.15;
+    const bob=0.03*Math.sin(t*1.6+f.wob);
+    f._sx=f.x*innerWidth;
+    f._sy=(f.y+bob)*innerHeight;
+    f._r=(spr.width*(0.9/f.z)*(Math.min(innerWidth,innerHeight)/520))*0.42; // 히트반경
+  }
+}
+function drawFish(t){
+  const spr=G.sprite||defaultFish;
+  const sorted=[...G.fish].sort((a,b)=>b.z-a.z);
+  for(const f of sorted){
+    if(!f.alive) continue;
+    const scale=(0.9/f.z)*(Math.min(innerWidth,innerHeight)/520)*(f.caught?f.scale:1);
+    if(scale<=0) continue;
+    const w=spr.width*scale,h=spr.height*scale;
+    const tail=0.12*Math.sin(t*6+f.wob);
+    ctx.save();
+    ctx.translate(f._sx,f._sy);
+    ctx.scale(f.dir,1);
+    ctx.transform(1,0,tail,1,0,0);
+    ctx.globalAlpha=(f.caught?f.scale:1)*Math.max(0.5,1-(f.z-0.5)*0.4);
+    ctx.drawImage(spr,-w/2,-h/2,w,h);
+    ctx.restore();
+  }
+}
+
+/* ── 손 인식 결과 처리 + 잡기 판정 ───────────────────── */
+const CONN=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],
+  [9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+function detectHand(){
+  if(!G.landmarker||!G.camReady||video.videoWidth===0) return;
+  if(video.currentTime===G.lastVT) return;   // 새 프레임만
+  G.lastVT=video.currentTime;
+  let res; try{ res=G.landmarker.detectForVideo(video,performance.now()); }catch(e){ return; }
+  G.hand = (res && res.landmarks && res.landmarks[0]) ? res.landmarks[0] : null;
+}
+function handInteract(dt){
+  if(G.cool>0) G.cool-=dt;
+  const lm=G.hand; if(!lm) return;
+  // 핀치 비율: (엄지끝4 ↔ 검지끝8) / 손 크기(손목0 ↔ 중지MCP9)
+  const d=(a,b)=>Math.hypot(lm[a].x-lm[b].x, lm[a].y-lm[b].y);
+  const pinchRatio=d(4,8)/(d(0,9)+1e-4);
+  const grabbing = G.mode==='pinch' ? (pinchRatio<0.45) : true; // 터치모드는 항상 활성
+  // 상호작용 지점: 핀치 중점(정밀) 또는 검지끝(쉬움)
+  const tip = G.mode==='pinch'
+    ? {x:(lm[4].x+lm[8].x)/2, y:(lm[4].y+lm[8].y)/2}
+    : {x:lm[8].x, y:lm[8].y};
+  const p=lm2screen(tip.x,tip.y);
+  G._tipScreen=p; G._grabbing=grabbing;
+  if(!grabbing || !G.running) return;
+  // 반경 내 물고기 잡기(쿨다운으로 1핀치=최대1마리 방지 남용)
+  for(const f of G.fish){
+    if(!f.alive||f.caught) continue;
+    if(Math.hypot(f._sx-p.x,f._sy-p.y) < f._r + innerWidth*0.02){
+      f.caught=true; G.score++; scoreEl.textContent=G.score; G.cool=0.25;
+      burst(f._sx,f._sy);
+      break;
+    }
+  }
+}
+function drawHand(){
+  const lm=G.hand; if(!lm) return;
+  if(G.skel){
+    ctx.strokeStyle='rgba(245,240,232,0.55)';ctx.lineWidth=3;
+    for(const [a,b] of CONN){
+      const p1=lm2screen(lm[a].x,lm[a].y),p2=lm2screen(lm[b].x,lm[b].y);
+      ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
+    }
+    ctx.fillStyle='rgba(42,157,143,0.9)';
+    for(const i of [4,8,12,16,20,0]){const p=lm2screen(lm[i].x,lm[i].y);
+      ctx.beginPath();ctx.arc(p.x,p.y,5,0,7);ctx.fill();}
+  }
+  // 잡기 지점 표시(그랩 시 강조)
+  if(G._tipScreen){
+    const p=G._tipScreen, on=G._grabbing;
+    ctx.beginPath();ctx.arc(p.x,p.y,on?22:14,0,7);
+    ctx.strokeStyle=on?'#e76f51':'rgba(245,240,232,0.7)';ctx.lineWidth=on?4:2;ctx.stroke();
+  }
+}
+
+/* ── 잡기 파티클 ─────────────────────────────────────── */
+function burst(x,y){
+  for(let i=0;i<14;i++){const a=Math.random()*7,s=60+Math.random()*140;
+    G.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1});}
+}
+function drawParticles(dt){
+  ctx.save();
+  for(let i=G.particles.length-1;i>=0;i--){const p=G.particles[i];
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=200*dt;p.life-=dt*1.8;
+    if(p.life<=0){G.particles.splice(i,1);continue;}
+    ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle='#8fd6cd';
+    ctx.beginPath();ctx.arc(p.x,p.y,3,0,7);ctx.fill();}
+  ctx.restore();
+}
+
+/* ── 메인 루프 ───────────────────────────────────────── */
+let last=performance.now();
+function frame(now){
+  const t=(now-G.t0)/1000, dt=Math.min(0.05,(now-last)/1000); last=now;
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  drawCam(); drawSea(t);
+  detectHand();
+  updateFish(t,dt); drawFish(t);
+  handInteract(dt);
+  drawHand(); drawParticles(dt); drawBubbles(dt);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>근거기반의 작업치료와 제도의 이해</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Navy academic palette */
+  --navy-900:#0A1E38;
+  --navy-800:#0F2A4A;
+  --navy-700:#163b63;
+  --blue-600:#1F5394;
+  --blue-500:#2E6FB8;
+  --sky-400:#5FA3DE;
+  --sky-200:#A9CCED;
+  --gold:#C8A24B;
+  --gold-soft:#E2C98B;
+  --paper:#F7F9FC;
+  --paper-2:#EDF2F8;
+  --ink:#15243A;
+  --ink-soft:#42546E;
+  --line:#D7E0EC;
+  /* signal */
+  --green:#2E9E5B;
+  --amber:#F0A52B;
+  --red:#D8483F;
+  --ui:'Pretendard',system-ui,sans-serif;
+  --body:'Noto Sans KR',sans-serif;
+  --serif:'Noto Serif KR',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--navy-900);font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* ===== Stage ===== */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.slide{
+  position:absolute;width:min(96vw,1280px);height:min(calc(96vw*0.5625),720px);
+  background:var(--paper);border-radius:14px;overflow:hidden;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.6);
+  opacity:0;transform:translateY(18px) scale(.985);pointer-events:none;
+  transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1);
+}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.prev{transform:translateY(-18px) scale(.985)}
+
+/* shared inner layout */
+.inner{position:absolute;inset:0;padding:56px 64px 60px 96px;display:flex;flex-direction:column}
+.eyebrow{display:flex;align-items:center;gap:12px;font-family:var(--ui);font-size:14px;font-weight:600;letter-spacing:.06em;color:var(--blue-600);text-transform:uppercase}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.title{font-family:var(--serif);font-weight:700;color:var(--navy-800);line-height:1.22;letter-spacing:-.01em}
+.h1{font-size:42px;margin-top:14px}
+.h2{font-size:34px;margin-top:10px}
+.lead{font-size:18px;color:var(--ink-soft);line-height:1.7;margin-top:14px;max-width:62ch}
+.rule{height:3px;width:54px;background:var(--gold);border-radius:2px;margin:18px 0 6px}
+
+/* left part rail (signature) */
+.rail{position:absolute;left:0;top:0;bottom:0;width:54px;background:linear-gradient(180deg,var(--navy-800),var(--navy-900));
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:26px 0;color:#fff}
+.rail .pno{writing-mode:vertical-rl;font-family:var(--ui);font-weight:700;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--sky-200)}
+.rail .pbig{font-family:var(--serif);font-weight:700;font-size:26px;color:var(--gold-soft)}
+.rail .pseg{display:flex;flex-direction:column;gap:7px}
+.rail .pseg i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22)}
+.rail .pseg i.on{background:var(--gold)}
+
+/* ===== Slide 1 title ===== */
+.cover{position:absolute;inset:0;background:radial-gradient(120% 120% at 80% 10%,var(--navy-700),var(--navy-900) 60%);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 90px}
+.cover .module{font-family:var(--ui);font-weight:700;letter-spacing:.3em;font-size:14px;color:var(--gold-soft);text-transform:uppercase}
+.cover h1{font-family:var(--serif);font-weight:700;font-size:60px;line-height:1.18;margin-top:22px;letter-spacing:-.015em}
+.cover h1 b{color:var(--gold-soft);font-weight:700}
+.cover .sub{font-size:19px;color:var(--sky-200);margin-top:22px;line-height:1.6;max-width:60ch}
+.cover .meta{margin-top:46px;display:flex;gap:14px;flex-wrap:wrap}
+.cover .chip{font-family:var(--ui);font-size:13px;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.28);padding:8px 16px;border-radius:999px}
+.cover .flow{position:absolute;right:64px;bottom:58px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:13px;color:var(--sky-200)}
+.cover .flow b{color:var(--gold-soft)}
+.cover .presenter{position:absolute;left:90px;bottom:54px;padding-left:15px;border-left:3px solid var(--gold)}
+.cover .presenter .paff{font-family:var(--ui);font-size:13px;font-weight:600;color:var(--sky-200);letter-spacing:.01em}
+.cover .presenter .pname{font-family:var(--serif);font-size:19px;font-weight:600;color:#fff;margin-top:4px}
+.cover .presenter .pname b{color:var(--gold-soft);font-weight:700;margin-left:3px}
+.cover-glow{position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(95,163,222,.35),transparent 65%);pointer-events:none}
+
+/* generic content blocks */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 8px 24px -18px rgba(15,42,74,.5)}
+.card h3{font-family:var(--ui);font-size:17px;font-weight:700;color:var(--navy-800);display:flex;align-items:center;gap:10px}
+.card p{font-size:15px;color:var(--ink-soft);line-height:1.65;margin-top:9px}
+.tag{font-family:var(--ui);font-size:12px;font-weight:700;color:#fff;background:var(--blue-600);padding:3px 9px;border-radius:6px}
+
+/* goal slide flow chips */
+.flowline{display:flex;align-items:center;gap:14px;margin-top:30px;flex-wrap:wrap}
+.flowstep{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 20px;text-align:center;min-width:130px}
+.flowstep .n{font-family:var(--ui);font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.05em}
+.flowstep .t{font-family:var(--serif);font-weight:600;font-size:17px;color:var(--navy-800);margin-top:4px}
+.flowarr{color:var(--sky-400);font-size:22px;font-weight:700}
+
+/* download button */
+.dl{display:inline-flex;align-items:center;gap:9px;font-family:var(--ui);font-weight:700;font-size:14px;color:#fff;
+  background:var(--blue-600);padding:11px 20px;border-radius:10px;text-decoration:none;transition:transform .15s,background .2s;
+  box-shadow:0 10px 24px -12px rgba(31,83,148,.8)}
+.dl:hover{background:var(--navy-800);transform:translateY(-2px)}
+.dl svg{width:17px;height:17px}
+.dl-row{margin-top:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-top:18px}
+.dl-note{font-family:var(--ui);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+/* source + search-keyword connector */
+.src{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap}
+.src-lbl{font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--blue-600);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.src-lbl::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.src-link{font-family:var(--ui);font-size:13px;font-weight:700;color:var(--navy-800);text-decoration:none;border-bottom:2px solid var(--gold);padding-bottom:1px;transition:color .2s}
+.src-link:hover{color:var(--blue-600)}
+.src-link .ext{font-size:11px;opacity:.6}
+.kwset{display:flex;gap:7px;flex-wrap:wrap}
+.kw{font-family:var(--ui);font-size:12px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line);padding:4px 11px 4px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+.kw svg{width:11px;height:11px;color:var(--sky-400);flex:none}
+
+/* aggregated reference list (slide 13) */
+.reflist{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.refrow{display:grid;grid-template-columns:148px 1fr;gap:18px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px}
+.refrow .topic{font-family:var(--ui);font-weight:700;font-size:14px;color:var(--navy-800);border-left:3px solid var(--gold);padding-left:11px;line-height:1.3}
+.refrow .topic em{display:block;font-style:normal;font-weight:600;font-size:11px;color:var(--blue-600);margin-top:2px}
+.refrow .det{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
+.refrow .det a{font-family:var(--ui);font-size:13.5px;font-weight:700;color:var(--navy-800);text-decoration:none;border-bottom:2px solid var(--gold);padding-bottom:1px}
+.refrow .det a:hover{color:var(--blue-600)}
+
+/* Venn (slide 3) */
+.vennwrap{flex:1;display:flex;gap:34px;align-items:center;margin-top:14px}
+.venn{flex:0 0 430px}
+.vlist{display:flex;flex-direction:column;gap:16px}
+.vitem{display:flex;gap:14px;align-items:flex-start}
+.vitem .sw{width:14px;height:14px;border-radius:4px;margin-top:5px;flex:none}
+.vitem h4{font-family:var(--ui);font-weight:700;font-size:17px;color:var(--navy-800)}
+.vitem .en{font-family:var(--ui);font-size:12.5px;color:var(--blue-600);font-weight:600}
+.vitem p{font-size:14px;color:var(--ink-soft);line-height:1.6;margin-top:3px}
+
+/* Traffic light (slide 4) */
+.signalwrap{display:grid;grid-template-columns:200px 1fr;gap:34px;flex:1;margin-top:14px;align-items:center}
+.lightbox{background:var(--navy-800);border-radius:20px;padding:22px 0;display:flex;flex-direction:column;align-items:center;gap:18px;box-shadow:inset 0 2px 10px rgba(0,0,0,.4)}
+.bulb{width:72px;height:72px;border-radius:50%;opacity:.28;position:relative;transition:.3s}
+.bulb.lit{opacity:1}
+.bulb.g{background:radial-gradient(circle at 35% 30%,#7fe3a6,var(--green))}
+.bulb.g.lit{box-shadow:0 0 30px 4px rgba(46,158,91,.7)}
+.bulb.a{background:radial-gradient(circle at 35% 30%,#ffd27a,var(--amber))}
+.bulb.a.lit{box-shadow:0 0 30px 4px rgba(240,165,43,.6)}
+.bulb.r{background:radial-gradient(circle at 35% 30%,#f49b94,var(--red))}
+.bulb.r.lit{box-shadow:0 0 30px 4px rgba(216,72,63,.6)}
+.signal-rows{display:flex;flex-direction:column;gap:13px}
+.srow{display:flex;gap:16px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left-width:5px;border-radius:10px;padding:14px 18px}
+.srow.g{border-left-color:var(--green)}
+.srow.a{border-left-color:var(--amber)}
+.srow.r{border-left-color:var(--red)}
+.srow .badge{font-family:var(--ui);font-weight:800;font-size:13px;color:#fff;padding:5px 11px;border-radius:7px;white-space:nowrap;margin-top:1px}
+.srow.g .badge{background:var(--green)}
+.srow.a .badge{background:var(--amber)}
+.srow.r .badge{background:var(--red)}
+.srow h4{font-family:var(--ui);font-weight:700;font-size:15.5px;color:var(--navy-800)}
+.srow p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin-top:3px}
+.keymsg{margin-top:6px;background:var(--paper-2);border-radius:10px;padding:13px 18px;font-size:14px;color:var(--navy-800);line-height:1.6}
+.keymsg b{color:var(--blue-600)}
+
+/* Formula (slide 5) */
+.formula{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:30px}
+.feq{display:flex;align-items:stretch;gap:18px;flex-wrap:wrap;justify-content:center}
+.fterm{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px 28px;text-align:center;min-width:200px;box-shadow:0 12px 30px -20px rgba(15,42,74,.6)}
+.fterm .ko{font-family:var(--serif);font-weight:700;font-size:24px;color:var(--navy-800)}
+.fterm .en{font-family:var(--ui);font-size:12px;font-weight:600;color:var(--blue-600);margin-top:5px;letter-spacing:.03em}
+.fterm .ds{font-size:13.5px;color:var(--ink-soft);margin-top:10px;line-height:1.55}
+.fterm.result{background:linear-gradient(135deg,var(--navy-800),var(--navy-700));border:none}
+.fterm.result .ko{color:#fff}.fterm.result .en{color:var(--gold-soft)}.fterm.result .ds{color:var(--sky-200)}
+.fop{display:flex;align-items:center;font-family:var(--serif);font-size:40px;color:var(--gold);font-weight:700}
+
+/* code cards (slide 6) */
+.codes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}
+.codecard{background:#fff;border:1px solid var(--line);border-top:4px solid var(--blue-500);border-radius:12px;padding:20px}
+.codecard .ci{font-family:var(--ui);font-size:12px;font-weight:700;color:var(--blue-600);letter-spacing:.05em}
+.codecard h4{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--navy-800);margin-top:6px}
+.codecard p{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin-top:9px}
+.warn{margin-top:20px;background:#FBF3E6;border:1px solid var(--gold-soft);border-radius:10px;padding:13px 18px;display:flex;gap:11px;align-items:flex-start;font-size:14px;color:#7a5a16;line-height:1.6}
+.warn b{color:#5d4310}
+
+/* limit -> overcome (slide 7) */
+.vs{display:grid;grid-template-columns:1fr 64px 1fr;gap:16px;align-items:center;flex:1;margin-top:20px}
+.panel{border-radius:14px;padding:26px 28px;height:100%;display:flex;flex-direction:column;justify-content:center}
+.panel.limit{background:#fff;border:1px solid var(--line)}
+.panel.over{background:linear-gradient(135deg,var(--navy-800),var(--navy-700));color:#fff}
+.panel h3{font-family:var(--ui);font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.panel.limit h3{color:var(--blue-600)}.panel.over h3{color:var(--gold-soft)}
+.panel ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:14px}
+.panel li{font-size:15.5px;line-height:1.55;padding-left:20px;position:relative}
+.panel li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:8px;border-radius:50%}
+.panel.limit li{color:var(--ink)}
+.panel.limit li::before{background:var(--blue-500)}
+.panel.over li{color:#fff}
+.panel.over li::before{background:var(--gold)}
+.vsarrow{display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--sky-400);font-weight:700}
+
+/* pilot (slide 8) */
+.pilot2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.pcard .icon{width:46px;height:46px;border-radius:12px;background:var(--paper-2);display:flex;align-items:center;justify-content:center;color:var(--blue-600)}
+.pcard h4{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--navy-800);margin-top:14px}
+.pcard p{font-size:14px;color:var(--ink-soft);line-height:1.6;margin-top:8px}
+.shift{margin-top:22px;background:var(--paper-2);border-radius:12px;padding:16px 22px;display:flex;align-items:center;gap:18px;justify-content:center;flex-wrap:wrap}
+.shift .s{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--ink-soft)}
+.shift .a{font-size:24px;color:var(--gold);font-weight:700}
+.shift .s.to{color:var(--navy-800)}
+
+/* QA (slide 9) */
+.qalist{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+.qa{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qa .q{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none}
+.qa .q .qmark{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--blue-600);flex:none}
+.qa .q .qt{font-family:var(--ui);font-weight:700;font-size:16px;color:var(--navy-800);flex:1}
+.qa .q .chev{color:var(--sky-400);transition:transform .3s;font-size:14px}
+.qa.open .chev{transform:rotate(180deg)}
+.qa .a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;padding:0 22px 0 56px}
+.qa.open .a{max-height:200px;padding:0 22px 18px 56px}
+.qa .a p{font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.qa .a .amark{font-family:var(--serif);font-weight:700;color:var(--gold);margin-right:6px}
+
+/* ICF (slide 10) */
+.icfwrap{flex:1;display:flex;align-items:center;justify-content:center;margin-top:6px}
+
+/* spectrum (slide 11) */
+.spectrum{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px;flex:1;align-content:center}
+.spec{border-radius:14px;padding:26px 24px;background:#fff;border:1px solid var(--line);position:relative;display:flex;flex-direction:column}
+.spec .num{font-family:var(--ui);font-weight:800;font-size:13px;color:#fff;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--blue-600)}
+.spec h4{font-family:var(--serif);font-weight:700;font-size:21px;color:var(--navy-800);margin-top:16px}
+.spec .en{font-family:var(--ui);font-size:12.5px;font-weight:600;color:var(--blue-600);margin-top:3px}
+.spec p{font-size:14.5px;color:var(--ink-soft);line-height:1.65;margin-top:12px}
+.spec.c2{background:linear-gradient(160deg,#fff,var(--paper-2))}
+.spec.c3{background:linear-gradient(160deg,var(--navy-800),var(--navy-700));border:none}
+.spec.c3 h4{color:#fff}.spec.c3 .en{color:var(--gold-soft)}.spec.c3 p{color:var(--sky-200)}
+.spec.c3 .num{background:var(--gold);color:var(--navy-900)}
+
+/* closing (slide 12) */
+.close{position:absolute;inset:0;background:radial-gradient(120% 120% at 20% 90%,var(--navy-700),var(--navy-900) 60%);color:#fff;padding:60px 90px;display:flex;flex-direction:column;justify-content:center}
+.close .eyebrow2{font-family:var(--ui);font-weight:700;letter-spacing:.22em;font-size:13px;color:var(--gold-soft);text-transform:uppercase}
+.close h2{font-family:var(--serif);font-weight:700;font-size:38px;line-height:1.32;margin-top:18px;letter-spacing:-.01em}
+.close h2 b{color:var(--gold-soft)}
+.bridge{margin-top:30px;display:flex;gap:16px;align-items:stretch;flex-wrap:wrap}
+.bcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:18px 22px;flex:1;min-width:220px}
+.bcard .gl{display:inline-flex;align-items:center;gap:7px;font-family:var(--ui);font-weight:700;font-size:12px;color:var(--green);background:rgba(46,158,91,.16);padding:5px 10px;border-radius:7px}
+.bcard h4{font-family:var(--serif);font-weight:600;font-size:18px;margin-top:12px}
+.bcard p{font-size:13.5px;color:var(--sky-200);line-height:1.6;margin-top:6px}
+.close .sign{margin-top:38px;font-size:16px;color:var(--sky-200)}
+.close .sign b{color:#fff;font-weight:600}
+.statement{margin-top:26px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-left:4px solid var(--gold);border-radius:14px;padding:24px 30px;display:flex;flex-direction:column;gap:9px}
+.statement p{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.5;color:#fff}
+.tk{font-weight:700;padding:1px 11px;border-radius:8px;display:inline-block}
+.tk-goal{background:rgba(95,163,222,.22);color:#bcdcff;border:1px dashed rgba(95,163,222,.6)}
+.tk-evi{background:rgba(46,158,91,.2);color:#9be3b8;border:1px dashed rgba(46,158,91,.6)}
+.tk-sys{background:rgba(200,162,75,.2);color:var(--gold-soft);border:1px dashed rgba(200,162,75,.6)}
+.tk-ot{background:#fff;color:var(--navy-900)}
+
+/* ===== Controls / chrome ===== */
+.hud{position:fixed;left:0;right:0;bottom:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:30;color:#fff}
+.hud .lbl{font-family:var(--ui);font-size:12.5px;font-weight:600;color:var(--sky-200);letter-spacing:.02em}
+.hud .lbl b{color:#fff}
+.nav{display:flex;align-items:center;gap:10px}
+.nav button{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.nav button:hover{background:var(--blue-600);border-color:var(--blue-600)}
+.counter{font-family:var(--ui);font-size:13px;font-weight:700;color:#fff;min-width:54px;text-align:center}
+.counter span{color:var(--sky-200);font-weight:500}
+.progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--blue-500),var(--gold));z-index:40;transition:width .4s ease}
+.dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px;z-index:30}
+.dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:.2s}
+.dots i.on{background:var(--gold);transform:scale(1.25)}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{background:#fff}
+  .progress,.hud,.dots{display:none!important}
+  .stage{position:static;display:block;width:auto;height:auto;overflow:visible}
+  .slide{position:relative!important;width:1280px;height:720px;opacity:1!important;transform:none!important;pointer-events:auto;box-shadow:none;border-radius:0;margin:0;overflow:hidden;page-break-after:always;break-after:page}
+  .slide:last-child{page-break-after:auto;break-after:auto}
+  .qa .a{max-height:none!important;padding:0 22px 18px 56px!important}
+  .qa .chev{display:none}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+@media (max-width:900px){
+  .inner{padding:34px 30px 50px 64px}
+  .rail{width:42px}
+  .h1{font-size:30px}.h2{font-size:25px}
+  .cover{padding:0 44px}.cover h1{font-size:38px}
+  .cover .presenter{position:static;margin-top:24px;left:auto;bottom:auto}.cover .flow{display:none}
+  .grid2,.codes,.pilot2,.spectrum,.vs{grid-template-columns:1fr;display:flex;flex-direction:column}
+  .vennwrap,.signalwrap{flex-direction:column;display:flex}
+  .signalwrap{grid-template-columns:none}
+  .lightbox{flex-direction:row;width:100%}
+  .feq{flex-direction:column}.fop{transform:rotate(90deg)}
+  .dots{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:opacity .2s}
+  .bulb{transition:none}
+}
+.slide:focus-visible{outline:3px solid var(--gold)}
+/* ===== Green-light interventions slide ===== */
+.glayout{display:grid;grid-template-columns:1fr 270px;gap:30px;margin-top:18px;flex:1;min-height:0}
+.gmain{display:flex;flex-direction:column;min-height:0}
+.gmain-h{display:flex;align-items:center;gap:10px;font-family:var(--ui);font-weight:800;font-size:14px;color:var(--green);margin-bottom:12px}
+.gmain-h .gbadge{background:var(--green);color:#fff;font-size:12px;font-weight:800;padding:4px 11px;border-radius:7px;letter-spacing:.02em}
+.gmain-h small{color:var(--ink-soft);font-weight:600}
+.gchips{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;overflow:auto}
+.gchip{font-family:var(--ui);font-size:13px;font-weight:700;color:#1d6b3f;background:rgba(46,158,91,.12);border:1px solid rgba(46,158,91,.32);padding:6px 12px;border-radius:8px;line-height:1.25;display:inline-flex;align-items:center;gap:6px}
+.gchip::before{content:"●";color:var(--green);font-size:9px}
+.gchip b{font-weight:800;color:#15512f}
+.gside{display:flex;flex-direction:column;gap:14px}
+.gstat{background:linear-gradient(160deg,#2E9E5B,#1d6b3f);color:#fff;border-radius:12px;padding:18px 18px 16px;box-shadow:0 14px 30px -16px rgba(46,158,91,.7)}
+.gstat .big{font-family:var(--serif);font-weight:700;font-size:46px;line-height:1}
+.gstat .big span{font-size:22px;opacity:.85}
+.gstat .cap{font-family:var(--ui);font-size:13px;font-weight:600;margin-top:6px;opacity:.95}
+.gminibars{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+.gmb{font-family:var(--ui);font-size:11px;font-weight:700;color:var(--ink-soft)}
+.gmb .track{height:8px;border-radius:5px;background:var(--paper-2);margin-top:3px;overflow:hidden}
+.gmb .fill{height:100%;border-radius:5px}
+.gkey{background:#fff;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px;padding:14px 16px}
+.gkey h4{font-family:var(--ui);font-size:13px;font-weight:800;color:var(--navy-800);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.gkey p{font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
+.gkey b{color:var(--green)}
+/* ===== Yellow / Red interventions slide ===== */
+.yrlayout{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;margin-top:18px;flex:1;min-height:0}
+.yrcol{display:flex;flex-direction:column;min-height:0;border-radius:12px;padding:16px 18px}
+.yrcol.y{background:rgba(240,165,43,.08);border:1px solid rgba(240,165,43,.32)}
+.yrcol.r{background:rgba(216,72,63,.07);border:1px solid rgba(216,72,63,.28)}
+.yrhead{display:flex;align-items:center;gap:10px;font-family:var(--ui);font-weight:800;font-size:14px;color:var(--navy-800)}
+.yrbadge{color:#fff;font-size:12px;font-weight:800;padding:4px 11px;border-radius:7px;white-space:nowrap}
+.yrbadge.y{background:var(--amber)}
+.yrbadge.r{background:var(--red)}
+.yrpct{font-family:var(--serif);font-weight:700;font-size:17px;margin-left:auto}
+.yrcol.y .yrpct{color:#b5790f}
+.yrcol.r .yrpct{color:var(--red)}
+.yrdesc{font-family:var(--ui);font-size:12.5px;color:var(--ink-soft);line-height:1.55;margin:8px 0 12px}
+.yrchips{display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start;overflow:auto}
+.ychip{font-family:var(--ui);font-size:12.5px;font-weight:700;color:#8a5a09;background:rgba(240,165,43,.16);border:1px solid rgba(240,165,43,.4);padding:5px 11px;border-radius:8px}
+.rchip{font-family:var(--ui);font-size:12.5px;font-weight:700;color:#a5332b;background:rgba(216,72,63,.12);border:1px solid rgba(216,72,63,.35);padding:5px 11px;border-radius:8px}
+.yrnote{font-family:var(--ui);font-size:12px;line-height:1.55;color:#7a3a35;background:#fff;border:1px solid rgba(216,72,63,.25);border-radius:9px;padding:12px 13px;margin-top:auto}
+.yrnote b{color:var(--red)}
+.exlbl{font-family:var(--ui);font-size:11px;font-weight:700;color:var(--ink-soft);opacity:.8;margin-bottom:7px}
+/* ===== New medical technology (WSTP) slide ===== */
+.wstp{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;margin-top:20px;flex:1;min-height:0}
+.wstp-def{background:#fff;border:1px solid var(--line);border-top:4px solid var(--blue-500);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column}
+.wstp-def .ci{font-family:var(--ui);font-size:12px;font-weight:700;color:var(--blue-600);letter-spacing:.05em}
+.wstp-def h4{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--navy-800);margin-top:6px}
+.wstp-def p{font-size:14px;color:var(--ink-soft);line-height:1.65;margin-top:10px}
+.wstp-prog{margin-top:auto;font-family:var(--ui);font-size:12.5px;font-weight:700;color:var(--navy-800);background:var(--paper-2);border-radius:8px;padding:10px 13px;line-height:1.45}
+.wstp-eval{display:flex;flex-direction:column;gap:12px}
+.evalcard{background:rgba(46,158,91,.08);border:1px solid rgba(46,158,91,.3);border-radius:12px;padding:14px 16px}
+.evalcard .et{font-family:var(--ui);font-weight:800;font-size:13px;color:var(--green);display:flex;align-items:center;gap:7px}
+.evalcard p{font-size:13px;color:var(--ink-soft);line-height:1.55;margin-top:6px}
+/* ===== H.OT MORNING BRIEF newsletter slide ===== */
+.nllayout{display:grid;grid-template-columns:0.82fr 1fr;gap:30px;margin-top:18px;flex:1;min-height:0}
+.nlinfo{display:flex;flex-direction:column}
+.nlsteps{display:flex;flex-direction:column;gap:13px;margin-top:4px}
+.nlstep{display:flex;gap:12px;align-items:flex-start}
+.nlstep .nn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--blue-600);color:#fff;font-family:var(--ui);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.nlstep h4{font-family:var(--ui);font-size:14px;font-weight:800;color:var(--navy-800)}
+.nlstep p{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-top:2px}
+.nlstack{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto;padding-top:14px}
+.nltag{font-family:var(--ui);font-size:11.5px;font-weight:700;color:var(--blue-600);background:rgba(46,111,184,.1);border:1px solid rgba(46,111,184,.25);padding:4px 11px;border-radius:999px}
+.nlinfolist{margin-top:6px}
+.nlrow{display:flex;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
+.nlrow .k{flex:none;width:54px;font-family:var(--ui);font-size:12px;font-weight:800;color:var(--blue-600);letter-spacing:.02em}
+.nlrow .v{font-size:14.5px;color:var(--navy-800);font-weight:600;line-height:1.45}
+.nlcta{margin-top:auto;background:rgba(46,111,184,.08);border:1px solid rgba(46,111,184,.25);border-radius:12px;padding:15px 17px;font-size:13.5px;color:var(--navy-800);line-height:1.6}
+.nlcta b{color:var(--blue-600)}
+/* email mockup (replicates the actual mail design) */
+.nlframe{background:#F8FAFC;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 18px 44px -22px rgba(15,23,42,.55);overflow:hidden}
+.nlmail{background:#fff;border-radius:13px;padding:20px 22px;font-family:'Apple SD Gothic Neo',var(--ui)}
+.nlmail .d{color:#64748B;font-size:11px}
+.nlmail h3{color:#0F172A;font-size:25px;font-weight:800;margin:5px 0;letter-spacing:-.01em}
+.nlmail .sub{color:#475569;font-size:11.5px;line-height:1.5}
+.nlmail .note{margin-top:13px;background:#F1F5F9;border-radius:11px;padding:13px 15px}
+.nlmail .note .lbl{color:#2563EB;font-size:10px;font-weight:800;letter-spacing:.04em}
+.nlmail .note p{color:#334155;font-size:11px;line-height:1.6;margin-top:6px}
+.nlmail .cat{color:#0F172A;font-size:15px;font-weight:800;margin-top:15px}
+.nlmail .art{border-bottom:1px solid #E2E8F0;padding:9px 0 11px}
+.nlmail .art .t{color:#0F172A;font-size:12.5px;font-weight:700;line-height:1.4}
+.nlmail .art .s{color:#475569;font-size:11px;line-height:1.55;margin-top:5px}
+.nlmail .art .src{color:#64748B;font-size:10px;margin-top:5px}
+.nlmail .art .lk{color:#2563EB;font-size:10.5px;font-weight:600;margin-top:5px}
+.nlmail .foot{margin-top:13px;padding-top:11px;border-top:1px solid #E2E8F0;color:#94A3B8;font-size:9.5px}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="stage" id="stage">
+
+<!-- ===== Slide 1 : Title ===== -->
+<section class="slide" data-part="0">
+  <div class="cover">
+    <div class="cover-glow"></div>
+    <h1>근거기반의 작업치료와<br><b>제도</b>의 이해</h1>
+    <div class="meta">
+      <span class="chip">근거기반실무(EBP)</span>
+      <span class="chip">병원 수가체계</span>
+      <span class="chip">어린이 재활의료기관 시범사업</span>
+      <span class="chip">ICF · 작업기반 실무</span>
+    </div>
+    <div class="flow">강의 흐름 &nbsp;<b>EBP</b> → 수가제도 → 시범사업 → <b>ICF·작업기반</b></div>
+    <div class="presenter">
+      <div class="paff">대한작업치료사협회 · 병원기반아동작업치료 TFT</div>
+      <div class="pname">푸르메재단 넥슨어린이재활병원 <b>함형광</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 2 : Review & Goals ===== -->
+<section class="slide" data-part="0">
+  <div class="rail"><span class="pno">Intro</span><span class="pbig">00</span><span class="pseg"><i class="on"></i><i></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>강의 목표</div>
+    <h1 class="title h1">발달 이해에서 '근거와 제도'로 이어가기</h1>
+    <div class="rule"></div>
+    <div class="grid2">
+      <div class="card">
+        <h3><span class="tag" style="background:var(--gold);color:var(--navy-900)">QUESTION</span> 이 강의가 던지는 질문</h3>
+        <p>우리가 매일 행하는 '치료'는 어떤 근거 위에 서 있으며, 수가와 정책 안에서 어떻게 실현되는가.</p>
+      </div>
+    </div>
+    <div class="flowline">
+      <div class="flowstep"><div class="n">PART 1</div><div class="t">EBP 핵심</div></div>
+      <span class="flowarr">→</span>
+      <div class="flowstep"><div class="n">PART 2</div><div class="t">수가 체계</div></div>
+      <span class="flowarr">→</span>
+      <div class="flowstep"><div class="n">PART 3</div><div class="t">시범사업</div></div>
+      <span class="flowarr">→</span>
+      <div class="flowstep"><div class="n">PART 4</div><div class="t">ICF·작업기반</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 3 : 3 elements of EBP ===== -->
+<section class="slide" data-part="1">
+  <div class="rail"><span class="pno">Part 1 · EBP</span><span class="pbig">01</span><span class="pseg"><i></i><i class="on"></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>근거기반 작업치료의 핵심</div>
+    <h1 class="title h1">임상 의사결정의 3요소</h1>
+    <div class="vennwrap">
+      <svg class="venn" viewBox="0 0 430 360" role="img" aria-label="근거기반 임상 의사결정 벤다이어그램">
+        <circle cx="160" cy="135" r="120" fill="#2E6FB8" fill-opacity="0.30"/>
+        <circle cx="270" cy="135" r="120" fill="#C8A24B" fill-opacity="0.32"/>
+        <circle cx="215" cy="230" r="120" fill="#1F5394" fill-opacity="0.30"/>
+        <text x="120" y="100" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#0F2A4A">환자·보호자</text>
+        <text x="120" y="120" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#0F2A4A">가치</text>
+        <text x="312" y="100" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#5d4310">임상가</text>
+        <text x="312" y="120" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#5d4310">전문성</text>
+        <text x="215" y="285" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#0F2A4A">최상의</text>
+        <text x="215" y="305" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#0F2A4A">연구 근거</text>
+        <circle cx="215" cy="175" r="34" fill="#0F2A4A"/>
+        <text x="215" y="171" text-anchor="middle" font-family="Noto Serif KR" font-size="14" font-weight="700" fill="#E2C98B">EBP</text>
+        <text x="215" y="188" text-anchor="middle" font-family="Noto Sans KR" font-size="10" fill="#A9CCED">의사결정</text>
+      </svg>
+      <div class="vlist">
+        <div class="vitem"><span class="sw" style="background:#2E6FB8"></span><div><h4>환자·보호자의 가치</h4><div class="en">Patient / Family Values</div><p>아동과 가족이 무엇을 의미 있게 여기는지 — 목표 설정의 출발점.</p></div></div>
+        <div class="vitem"><span class="sw" style="background:#C8A24B"></span><div><h4>임상가의 전문성</h4><div class="en">Clinical Expertise</div><p>임상 경험과 추론으로 근거를 개별 아동에게 맞게 적용하는 힘.</p></div></div>
+        <div class="vitem"><span class="sw" style="background:#1F5394"></span><div><h4>최상의 연구 근거</h4><div class="en">Best Research Evidence</div><p>현재 가능한 가장 신뢰도 높은 연구 결과를 임상에 반영.</p></div></div>
+      </div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처</span>
+      <a class="src-link" href="https://doi.org/10.1136/bmj.312.7023.71" target="_blank" rel="noopener">Sackett et al. (1996/2000), <i>Evidence-Based Medicine</i> <span class="ext">↗</span></a>
+      <a class="src-link" href="https://www.routledge.com/9781482253771" target="_blank" rel="noopener">Law &amp; MacDermid (2014), <i>Evidence-Based Rehabilitation</i> <span class="ext">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 4 : Traffic Light System ===== -->
+<section class="slide" data-part="1">
+  <div class="rail"><span class="pno">Part 1 · EBP</span><span class="pbig">02</span><span class="pseg"><i></i><i class="on"></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>Novak et al., 2019</div>
+    <h1 class="title h1">신호등 체계 <span style="font-family:var(--ui);font-size:20px;color:var(--ink-soft);font-weight:600">Traffic Light System</span></h1>
+    <div class="signalwrap">
+      <div class="lightbox" aria-hidden="true">
+        <div class="bulb r lit"></div>
+        <div class="bulb a lit"></div>
+        <div class="bulb g lit"></div>
+      </div>
+      <div>
+        <div class="signal-rows">
+          <div class="srow g"><span class="badge">GREEN · Go!</span><div><h4>반드시 시행 — 근거 수준이 높은 중재</h4><p>과제지향 훈련 · 양수집중훈련(HABIT) · 환경 중심 접근</p></div></div>
+          <div class="srow a"><span class="badge">YELLOW · Measure!</span><div><h4>주의 깊게 적용하고 결과를 측정해야 하는 중재</h4><p>효과 근거가 제한적 — 적용 시 반드시 성과 측정과 모니터링을 동반.</p></div></div>
+          <div class="srow r"><span class="badge">RED · Stop!</span><div><h4>근거에 따라 Green으로 무게중심을 옮기는 영역</h4><p>효과 근거가 약한 중재는 축소, 효과가 입증된 Green 중재로 치료 시간을 집중.</p></div></div>
+        </div>
+        <div class="keymsg">EBP는 논문을 읽는 일이 아니라, <b>제한된 치료 시간 안에서 가장 효과적인(Green) 치료를 선택하는 '윤리적 책임'</b>.</div>
+      </div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7035308/" target="_blank" rel="noopener">Novak et al. (2019), Current Neurology and Neuroscience Reports <span class="ext">↗</span></a>
+      <a class="src-link" href="https://doi.org/10.1111/1440-1630.12573" target="_blank" rel="noopener">Novak &amp; Honan (2019), <i>Aust Occup Ther J</i> · 아동 작업치료 효과 체계적 고찰 <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Evidence Alert Traffic Light System</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Novak 2019 cerebral palsy interventions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 4 : GREEN interventions (Do it!) ===== -->
+<section class="slide" data-part="1">
+  <div class="rail"><span class="pno">Part 1 · EBP</span><span class="pbig">03</span><span class="pseg"><i></i><i class="on"></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>Novak &amp; Honan, 2019 · 작업치료 체계적 고찰</div>
+    <h1 class="title h1">GREEN — “반드시 하라(Do it)” 중재</h1>
+    <div class="glayout">
+      <div class="gmain">
+        <div class="gmain-h"><span class="gbadge">GREEN · Go!</span> 높은 수준의 근거로 효과가 입증된 작업치료 중재 <small>(27개 영역)</small></div>
+        <div class="gchips">
+          <span class="gchip">행동중재 <b>ABA·Triple P·토큰경제</b></span>
+          <span class="gchip">양손 협응 훈련 <b>Bimanual</b></span>
+          <span class="gchip">코칭 <b>Coaching</b></span>
+          <span class="gchip">인지중재 <b>Cog-Fun·CAPS</b></span>
+          <span class="gchip">CO-OP</span>
+          <span class="gchip">건측제한운동 <b>CIMT</b></span>
+          <span class="gchip">CIMT + 양손훈련</span>
+          <span class="gchip">맥락 중심 중재 <b>Context-Focused</b></span>
+          <span class="gchip">Ditto (절차통증)</span>
+          <span class="gchip">조기중재 <b>ABA·발달돌봄</b></span>
+          <span class="gchip">가족중심 서비스</span>
+          <span class="gchip">섭식 중재 <b>Feeding</b></span>
+          <span class="gchip">목표지향 훈련 <b>GDT</b></span>
+          <span class="gchip">글씨쓰기 과제특이 연습</span>
+          <span class="gchip">가정 프로그램 <b>Home Program</b></span>
+          <span class="gchip">공동주의 <b>Joint Attention</b></span>
+          <span class="gchip">정신건강 중재</span>
+          <span class="gchip">보툴리눔 독소 후 작업치료</span>
+          <span class="gchip">키네시오 테이핑</span>
+          <span class="gchip">통증 관리</span>
+          <span class="gchip">부모 교육</span>
+          <span class="gchip">그림교환의사소통 <b>PECS</b></span>
+          <span class="gchip">자세잡기 <b>Positioning</b></span>
+          <span class="gchip">욕창·압력 관리</span>
+          <span class="gchip">사회기술 훈련</span>
+          <span class="gchip">트레드밀 훈련</span>
+          <span class="gchip">체중관리 ‘Mighty Moves’</span>
+        </div>
+      </div>
+      <div class="gside">
+        <div class="gstat">
+          <div class="big">30<span>%</span></div>
+          <div class="cap">135개 중재 지표 중 <b>40개</b>가 Green<br>= “반드시 하라(Do it)” 등급</div>
+          <div class="gminibars">
+            <div class="gmb">Green · Do it — 30%<div class="track"><div class="fill" style="width:30%;background:#fff"></div></div></div>
+            <div class="gmb" style="color:rgba(255,255,255,.85)">Yellow · Measure — 66%<div class="track" style="background:rgba(255,255,255,.25)"><div class="fill" style="width:66%;background:var(--gold-soft)"></div></div></div>
+            <div class="gmb" style="color:rgba(255,255,255,.85)">Red · Stop — 4%<div class="track" style="background:rgba(255,255,255,.25)"><div class="fill" style="width:4%;background:var(--red)"></div></div></div>
+          </div>
+        </div>
+        <div class="gkey">
+          <h4><span style="color:var(--green)">▲</span> 활동(Activity) 수준에 집중</h4>
+          <p>Green 중재는 ICF <b>활동 수준</b>에서 가장 많음(Green 14 &gt; Yellow 13 &gt; Red 0).<br>일상생활 기술을 <b>‘top-down’</b>으로 훈련하는 것이 작업치료의 핵심 강점<br>— worth-it line 위 운동·기능 Green 중재의 <b>100%가 top-down</b> 접근</p>
+        </div>
+      </div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처</span>
+      <a class="src-link" href="https://doi.org/10.1111/1440-1630.12573" target="_blank" rel="noopener">Novak &amp; Honan (2019), <i>Aust Occup Ther J</i>, 66:258–273 <span class="ext">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 4b : YELLOW / RED interventions ===== -->
+<section class="slide" data-part="1">
+  <div class="rail"><span class="pno">Part 1 · EBP</span><span class="pbig">04</span><span class="pseg"><i></i><i class="on"></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>Novak &amp; Honan, 2019 · 작업치료 체계적 고찰</div>
+    <h1 class="title h1">YELLOW &amp; RED — “측정하라 / 멈춰 살펴라”</h1>
+    <div class="yrlayout">
+      <div class="yrcol y">
+        <div class="yrhead"><span class="yrbadge y">YELLOW · Measure!</span> 효과 근거가 불충분한 중재 <span class="yrpct">66%</span></div>
+        <div class="yrdesc">전체 135개 중 <b>89개</b> — 가장 큰 비중. 효과를 단정할 근거가 부족하므로 <b>금지가 아니라</b>, 적용하되 반드시 <b>민감한 성과측정으로 진전 모니터링</b>이 필요한 영역. (신체기능·환경 수준에서 가장 흔한 코드)</div>
+        <div class="exlbl">대표 예시</div>
+        <div class="yrchips">
+          <span class="ychip">감각통합치료 SI</span>
+          <span class="ychip">감각 기반 접근</span>
+          <span class="ychip">신경발달치료 NDT</span>
+          <span class="ychip">보조기·스플린트</span>
+          <span class="ychip">캐스팅(일부)</span>
+          <span class="ychip">히포테라피</span>
+          <span class="ychip">보조공학·태블릿</span>
+          <span class="ychip">시지각·시운동 훈련</span>
+          <span class="ychip">감각 훈련</span>
+          <span class="ychip">고유수용성 중재</span>
+          <span class="ychip">마사지</span>
+          <span class="ychip">명상</span>
+          <span class="ychip">DIR / Floortime</span>
+          <span class="ychip">수면위생</span>
+          <span class="ychip">심상 훈련</span>
+        </div>
+      </div>
+      <div class="yrcol r">
+        <div class="yrhead"><span class="yrbadge r">RED · Stop!</span> 다시 살펴볼 중재 <span class="yrpct">4%</span></div>
+        <div class="yrdesc">전체 135개 중 <b>6개</b>로 가장 적음. 모두 <b>신체기능·구조 수준</b>의 중재였고, worth-it line 아래 운동 중재의 <b>100%가 ‘bottom-up’</b> 접근.</div>
+        <div class="exlbl">근거가 된 연구</div>
+        <div class="yrchips">
+          <span class="rchip">수동적 신장 (Katalinic 2010)</span>
+          <span class="rchip">가중담요·수면 (Gringras 2014)</span>
+        </div>
+        <div class="yrnote">논문의 결론은 “하지 말라”는 비난이 아니라, <b>이미 효과가 입증된 top-down 대안이 존재하므로</b> 같은 목표라면 Green 중재로 <b>자원을 옮길 수 있다</b>는 제언.</div>
+      </div>
+    </div>
+    <div class="keymsg" style="margin-top:14px">top-down 접근의 효과크기는 <b>0.89</b>, bottom-up은 <b>0.12</b> — 신호등은 ‘좋고 나쁨’의 낙인이 아니라, <b>제한된 치료 시간을 어디에 쓸지 정하는 의사결정 지도</b>.</div>
+    <div class="src">
+      <span class="src-lbl">출처</span>
+      <a class="src-link" href="https://doi.org/10.1111/1440-1630.12573" target="_blank" rel="noopener">Novak &amp; Honan (2019), <i>Aust Occup Ther J</i>, 66:258–273 <span class="ext">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 5 : Fee formula ===== -->
+<section class="slide" data-part="2">
+  <div class="rail"><span class="pno">Part 2 · 수가</span><span class="pbig">05</span><span class="pseg"><i></i><i></i><i class="on"></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>병원 수가체계의 이해</div>
+    <h1 class="title h1">행위별 수가제의 기본 원리</h1>
+    <p class="lead">병원 시스템 내 수가가 만들어지는 공식.</p>
+    <div class="formula">
+      <div class="feq">
+        <div class="fterm"><div class="ko">상대가치점수</div><div class="en">Relative Value Score</div><div class="ds">의료행위의 노력·시간·위험도를<br>상대적으로 점수화</div></div>
+        <div class="fop">×</div>
+        <div class="fterm"><div class="ko">환산지수</div><div class="en">Conversion Factor</div><div class="ds">점수를 금액으로 바꾸는<br>유형별 단가</div></div>
+        <div class="fop">=</div>
+        <div class="fterm result"><div class="ko">수가</div><div class="en">Fee · Price</div><div class="ds">실제 청구·보상되는<br>치료의 가격</div></div>
+      </div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://www.hira.or.kr" target="_blank" rel="noopener">건강보험심사평가원 · 건강보험 요양급여비용 <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>건강보험 요양급여비용</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>상대가치점수 환산지수</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 6 : Codes ===== -->
+<section class="slide" data-part="2">
+  <div class="rail"><span class="pno">Part 2 · 수가</span><span class="pbig">06</span><span class="pseg"><i></i><i></i><i class="on"></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>건강보험 요양급여비용 기준</div>
+    <h1 class="title h1">작업치료 주요 산정 코드</h1>
+    <div class="codes">
+      <div class="codecard"><div class="ci">빈도 높은 수가 ①</div><h4>특수작업치료</h4><p>대상·시간 등 산정 지침과 인정 기준 충족 시 청구 인정.</p></div>
+      <div class="codecard"><div class="ci">빈도 높은 수가 ②</div><h4>일상생활동작(ADL) 훈련</h4><p>작업기반 실무와 직접 맞닿는 코드 — 목표·기록의 일관성이 핵심.</p></div>
+      <div class="codecard"><div class="ci">빈도 높은 수가 ③</div><h4>연하재활치료</h4><p>적응증과 평가 근거가 명확할 때 인정 — 산정 조건 확인 필수.</p></div>
+    </div>
+    <div class="warn">
+      <span style="font-family:var(--ui);font-weight:800;font-size:12px;color:#7a5a16;background:#F3E4C2;padding:5px 10px;border-radius:7px;white-space:nowrap">실무 포인트</span>
+      <div>각 코드의 상대가치점수와 인정 기준을 정확히 알수록, 제공한 치료와 <b>전문성이 제도 안에서 정당하게 인정·보상</b>. 산정 기준을 아는 것은 곧 우리의 근거를 제도의 언어로 설명하는 일.</div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://www.hira.or.kr" target="_blank" rel="noopener">건강보험심사평가원 · 요양급여비용 산정지침 <span class="ext">↗</span></a>
+      <a class="src-link" href="https://www.kaot.org/kaot/board/index.jsp?code=eval" target="_blank" rel="noopener">대한작업치료사협회 · 보험센터 — 수가 및 심사기준 <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>작업치료 수가 산정지침</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>특수작업치료 연하재활 급여기준</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 6b : New medical technology — WSTP ===== -->
+<section class="slide" data-part="2">
+  <div class="rail"><span class="pno">Part 2 · 수가</span><span class="pbig">07</span><span class="pseg"><i></i><i></i><i class="on"></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>인정비급여 · 신의료기술평가</div>
+    <h1 class="title h1">휠체어 조작기술 훈련 <span style="font-family:var(--ui);font-size:20px;color:var(--ink-soft);font-weight:600">WSTP</span></h1>
+    <div class="wstp">
+      <div class="wstp-def">
+        <div class="ci">2023년 신의료기술 등재</div>
+        <h4>기술의 정의</h4>
+        <p>휠체어 조작 경험이 없거나 조작능력 개선이 필요한 환자에게 <b>훈련 프로그램을 적용</b>하여 휠체어 조작능력을 개선시키는 기술.</p>
+        <div class="wstp-prog">▸ 적용 프로그램: 캐나다 Dalhousie University가 개발한<br><b>Wheelchair Skills Training Program (WSTP)</b></div>
+      </div>
+      <div class="wstp-eval">
+        <div class="evalcard">
+          <div class="et"><span style="color:var(--green)">●</span> 안전성</div>
+          <p>훈련 과정에서 부상 보고가 없어 <b>안전한 기술</b>로 평가.</p>
+        </div>
+        <div class="evalcard">
+          <div class="et"><span style="color:var(--green)">●</span> 유효성</div>
+          <p>기존 재활치료 수행군과 비교 시 휠체어 조작기술 평가점수가 전반적으로 <b>유의하게 개선</b> — 유효한 기술로 평가.</p>
+        </div>
+      </div>
+    </div>
+    <div class="warn">
+      <span style="font-family:var(--ui);font-weight:800;font-size:12px;color:#7a5a16;background:#F3E4C2;padding:5px 10px;border-radius:7px;white-space:nowrap">제도 맥락</span>
+      <div>신의료기술평가제도(2007 도입)는 검증되지 않은 의료기술의 무분별한 사용을 막고 국민 건강권을 보호하는 장치 — 본 기술은 <b>2023년 제4차 보건복지부 신의료기술평가위원회</b>에서 안전성·유효성을 인정받아 최종 심의·고시.</div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://www.neca.re.kr" target="_blank" rel="noopener">한국보건의료연구원(NECA) · 신의료기술평가 <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>휠체어 조작기술 훈련 신의료기술</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Wheelchair Skills Training Program</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 6c : Bridge — 건강보험에서 시범사업으로 ===== -->
+<section class="slide" data-part="3">
+  <div class="rail"><span class="pno">Part 3 · 시범사업</span><span class="pbig">08</span><span class="pseg"><i></i><i></i><i></i><i class="on"></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>제도 전환의 배경</div>
+    <h1 class="title h1">건강보험 수가에서 시범사업으로</h1>
+    <p class="lead">행위별 수가제는 개별 치료 행위를 표준 기준으로 보상하는 체계. 성인·일반 재활 중심으로 설계되어, 아동 재활 고유의 요구를 담기에는 구조적 한계 존재.</p>
+    <div class="codes">
+      <div class="codecard"><div class="ci">미충족 영역 ①</div><h4>발달영역별 통합기능평가</h4><p>영역별 표준화된 검사항목을 통합한 평가에 대한 보상 근거 부족.</p></div>
+      <div class="codecard"><div class="ci">미충족 영역 ②</div><h4>종합치료계획 수립</h4><p>재활의학과 전문의 주관 하에 각 분야별 담당자가 참여하는 종합치료계획 수립의 보상 부재.</p></div>
+      <div class="codecard"><div class="ci">미충족 영역 ③</div><h4>지역사회 자원연계</h4><p>지역사회 자원연계 등 보건·복지 연계서비스의 산정 기준 부재.</p></div>
+    </div>
+    <div class="shift">
+      <span class="s">기존 건강보험 수가체계</span>
+      <span class="a">→</span>
+      <span class="s to">어린이 재활의료기관 시범사업</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 7 : Why pilot ===== -->
+<section class="slide" data-part="3">
+  <div class="rail"><span class="pno">Part 3 · 시범사업</span><span class="pbig">09</span><span class="pseg"><i></i><i></i><i></i><i class="on"></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>어린이 재활의료기관 시범사업</div>
+    <h1 class="title h1">왜 시범사업인가?</h1>
+    <div class="vs">
+      <div class="panel limit">
+        <h3>기존 건강보험 수가체계</h3>
+        <ul>
+          <li>행위별 수가로 <b>개별 치료 행위를 표준 기준으로 보상</b></li>
+          <li>표준화된 산정 기준에 따른 전문성 인정</li>
+          <li>성인·일반 재활 중심으로 설계</li>
+        </ul>
+      </div>
+      <div class="vsarrow">→</div>
+      <div class="panel over">
+        <h3>시범사업이 신설한 수가</h3>
+        <ul>
+          <li>발달영역별 통합기능평가 — <b>통합재활기능평가료</b></li>
+          <li>가족이 참여하는 종합치료계획 수립 — <b>통합계획교육상담료</b></li>
+          <li>지역사회 자원연계 — <b>지역사회연계료</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 8 : Pilot contents ===== -->
+<section class="slide" data-part="3">
+  <div class="rail"><span class="pno">Part 3 · 시범사업</span><span class="pbig">10</span><span class="pseg"><i></i><i></i><i></i><i class="on"></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>제2기 어린이 재활의료기관 시범사업</div>
+    <h1 class="title h1">주요 내용</h1>
+    <div class="pilot2">
+      <div class="pcard">
+        <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h4>종합치료계획 수립 · 교육 · 상담</h4>
+        <p>재활의학과 전문의 주관 하에 간호사·물리치료사 등 각 분야별 담당자가 참여하는 종합치료계획 수립을 보상 — 통합계획교육상담료.</p>
+      </div>
+      <div class="pcard">
+        <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h4>지역사회연계료 신설</h4>
+        <p>지역사회 자원연계 활동을 기관 내 활동·현장 방문활동으로 구분, 지역사회연계 의뢰서로 산정.</p>
+      </div>
+    </div>
+    <div class="shift">
+      <span class="s">병원 내 기능 향상</span>
+      <span class="a">→</span>
+      <span class="s to">지역사회로의 참여</span>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://www.mohw.go.kr" target="_blank" rel="noopener">보건복지부 · 제2기 어린이 재활의료기관 시범사업 <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>어린이 재활의료기관 지정·운영 시범사업</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>통합계획교육상담료 지역사회연계료</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 9 : Practical Q&A ===== -->
+<section class="slide" data-part="3">
+  <div class="rail"><span class="pno">Part 3 · 시범사업</span><span class="pbig">11</span><span class="pseg"><i></i><i></i><i></i><i class="on"></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>운영지침 기반 실무 Q&amp;A</div>
+    <h1 class="title h1">현장에서 자주 묻는 질문</h1>
+    <div class="qalist">
+      <div class="qa">
+        <div class="q"><span class="qmark">Q.</span><span class="qt">학교·복지관 연계 시 지역사회연계료 산정 방식은?</span><span class="chev">▼</span></div>
+        <div class="a"><p><span class="amark">A.</span>지역사회 자원연계 활동을 기관 내 활동·현장 방문활동으로 구분, 지역사회연계 의뢰서를 작성·청구할 때 산정. 연계 내역의 성실한 작성·보관이 인정의 핵심.</p></div>
+      </div>
+      <div class="qa">
+        <div class="q"><span class="qmark">Q.</span><span class="qt">'통합계획교육상담료'의 참여 인력 기준은?</span><span class="chev">▼</span></div>
+        <div class="a"><p><span class="amark">A.</span>각기 다른 직종 4인 이상이 참여할 때 산정. 주치의는 타과 의사도 가능하나, 환자사정·치료계획 수립·치료성과 점검·퇴원계획 등 종합 평가는 재활의학과 전문의가 실시.</p></div>
+      </div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020002000100&brdScnBltNo=4&brdBltNo=10895" target="_blank" rel="noopener">건강보험심사평가원 · 어린이 재활의료기관 시범사업 운영지침 <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>어린이 재활의료기관 운영지침</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>지역사회연계 의뢰서 통합재활안전방문관리료</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 10 : ICF model ===== -->
+<section class="slide" data-part="4">
+  <div class="rail"><span class="pno">Part 4 · ICF</span><span class="pbig">12</span><span class="pseg"><i></i><i></i><i></i><i class="on"></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>참여 중심 치료를 설명하는 공통 언어</div>
+    <h1 class="title h1">ICF 모델의 재해석</h1>
+    <div class="icfwrap">
+      <svg viewBox="0 0 880 330" role="img" aria-label="ICF 상호작용 모델 — 활동과 참여 강조" style="width:100%;max-height:330px">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto-start-reverse"><path d="M0,0 L9,4.5 L0,9 z" fill="#42546E"/></marker>
+        </defs>
+        <!-- top: health condition -->
+        <rect x="320" y="8" width="240" height="44" rx="10" fill="#0F2A4A"/>
+        <text x="440" y="35" text-anchor="middle" font-family="Noto Sans KR" font-size="16" font-weight="700" fill="#fff">건강상태 (장애 / 질병)</text>
+        <!-- middle row 3 boxes -->
+        <rect x="40" y="120" width="200" height="70" rx="10" fill="#E7EEF6" stroke="#D7E0EC"/>
+        <text x="140" y="150" text-anchor="middle" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#0F2A4A">신체 기능·구조</text>
+        <text x="140" y="172" text-anchor="middle" font-family="Noto Sans KR" font-size="12" fill="#42546E">Body Functions</text>
+        <!-- activity (highlight) -->
+        <rect x="340" y="112" width="200" height="86" rx="12" fill="#2E6FB8"/>
+        <rect x="340" y="112" width="200" height="86" rx="12" fill="none" stroke="#C8A24B" stroke-width="3"/>
+        <text x="440" y="148" text-anchor="middle" font-family="Noto Serif KR" font-size="19" font-weight="700" fill="#fff">활동</text>
+        <text x="440" y="172" text-anchor="middle" font-family="Noto Sans KR" font-size="12" fill="#A9CCED">Activity</text>
+        <!-- participation (highlight) -->
+        <rect x="640" y="112" width="200" height="86" rx="12" fill="#163b63"/>
+        <rect x="640" y="112" width="200" height="86" rx="12" fill="none" stroke="#C8A24B" stroke-width="3"/>
+        <text x="740" y="148" text-anchor="middle" font-family="Noto Serif KR" font-size="19" font-weight="700" fill="#E2C98B">참여</text>
+        <text x="740" y="172" text-anchor="middle" font-family="Noto Sans KR" font-size="12" fill="#A9CCED">Participation</text>
+        <!-- bottom: contextual factors -->
+        <rect x="180" y="262" width="240" height="56" rx="10" fill="#fff" stroke="#D7E0EC"/>
+        <text x="300" y="288" text-anchor="middle" font-family="Noto Sans KR" font-size="14" font-weight="700" fill="#0F2A4A">환경 요인</text>
+        <text x="300" y="306" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#42546E">Environmental Factors</text>
+        <rect x="460" y="262" width="240" height="56" rx="10" fill="#fff" stroke="#D7E0EC"/>
+        <text x="580" y="288" text-anchor="middle" font-family="Noto Sans KR" font-size="14" font-weight="700" fill="#0F2A4A">개인 요인</text>
+        <text x="580" y="306" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#42546E">Personal Factors</text>
+        <!-- connectors -->
+        <g stroke="#42546E" stroke-width="1.6" fill="none">
+          <!-- 건강상태 ↔ 3요소 (양방향) -->
+          <line x1="355" y1="54" x2="160" y2="116" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <line x1="440" y1="54" x2="440" y2="108" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <line x1="525" y1="54" x2="720" y2="108" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <!-- 신체기능 ↔ 활동 ↔ 참여 (양방향) -->
+          <line x1="244" y1="155" x2="336" y2="155" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <line x1="544" y1="155" x2="636" y2="155" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <!-- 환경 요인 ↔ 신체기능·활동 (양방향) -->
+          <line x1="255" y1="260" x2="165" y2="192" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <line x1="355" y1="260" x2="420" y2="201" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <!-- 개인 요인 ↔ 활동·참여 (양방향) -->
+          <line x1="525" y1="260" x2="460" y2="201" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <line x1="640" y1="260" x2="720" y2="201" marker-start="url(#ah)" marker-end="url(#ah)"/>
+        </g>
+      </svg>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health" target="_blank" rel="noopener">World Health Organization · ICF <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>WHO ICF framework</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>국제기능장애건강분류 활동 참여</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 11 : Occupation spectrum ===== -->
+<section class="slide" data-part="4">
+  <div class="rail"><span class="pno">Part 4 · ICF</span><span class="pbig">13</span><span class="pseg"><i></i><i></i><i></i><i class="on"></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>우리가 하는 건 '작업치료'</div>
+    <h1 class="title h1">작업의 3가지 스펙트럼</h1>
+    <p class="lead" style="margin-top:8px">위계가 아니라, 내가 하는 작업치료를 정확히 설명하는 언어.</p>
+    <div class="spectrum">
+      <div class="spec" style="border-top:4px solid var(--gold)">
+        <span class="num" style="background:var(--gold);color:var(--navy-900)">1</span>
+        <h4>작업중심</h4>
+        <div class="en">Occupation-centered</div>
+        <p>작업치료사로서 우리의 <b>정체성이자 철학</b> — 모든 판단의 바탕이 되는 관점.</p>
+      </div>
+      <div class="spec">
+        <span class="num">2</span>
+        <h4>작업기반</h4>
+        <div class="en">Occupation-based</div>
+        <p>의미 있는 작업 그 자체를 <b>'치료적 수단'</b>으로 사용하는 실천.</p>
+      </div>
+      <div class="spec">
+        <span class="num">3</span>
+        <h4>작업초점</h4>
+        <div class="en">Occupation-focused</div>
+        <p>치료의 결과와 <b>목표가 작업에 맞춰지는</b> 것.</p>
+      </div>
+    </div>
+    <div class="src">
+      <span class="src-lbl">출처 · 검색 키워드</span>
+      <a class="src-link" href="https://pubmed.ncbi.nlm.nih.gov/23311311/" target="_blank" rel="noopener">Fisher AG (2013), Scandinavian Journal of Occupational Therapy <span class="ext">↗</span></a>
+      <div class="kwset">
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>occupation-centred based focused Fisher</span>
+        <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>OTIPM 작업기반 실무</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 12 : Closing / bridge ===== -->
+<section class="slide" data-part="4">
+  <div class="close">
+    <div class="eyebrow2">실무 마무리 · 내 치료를 설명하기</div>
+    <h2>이제, 내가 하는 작업치료를<br><b>근거와 제도의 언어</b>로 설명할 수 있다.</h2>
+    <div class="statement">
+      <p>저는 이 아동의 <span class="tk tk-goal">참여 목표</span>를 위해,</p>
+      <p><span class="tk tk-evi">근거 · Green Light 중재</span>를 바탕으로,</p>
+      <p><span class="tk tk-sys">수가 · 시범사업 · ICF</span>의 틀 안에서</p>
+      <p><span class="tk tk-ot">작업치료</span>를 한다.</p>
+    </div>
+    <div class="sign">근거와 제도의 언어로 설명할 때, 작업치료의 전문성은 제도 안에서 명확해진다.<br>이어지는 오후 강의에서는 이를 뒷받침하는 Green Light 중재 — HABIT·과제지향 훈련 — 을 다룬다.</div>
+  </div>
+</section>
+<!-- ===== Slide 13 : References & keywords ===== -->
+<section class="slide" data-part="5">
+  <div class="rail"><span class="pno">참고자료</span><span class="pbig">14</span><span class="pseg"><i></i><i></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>참고 자료 · 검색 키워드</div>
+    <h1 class="title h1">더 찾아보기</h1>
+    <p class="lead" style="margin-top:6px">아래 키워드로 원문·지침을 직접 검색하거나, 출처를 눌러 바로 이동.</p>
+    <div class="reflist">
+      <div class="refrow">
+        <div class="topic">근거 신호등<em>Part 1 · EBP</em></div>
+        <div class="det">
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7035308/" target="_blank" rel="noopener">Novak et al. (2019)</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Evidence Alert Traffic Light System</span>
+        </div>
+      </div>
+      <div class="refrow">
+        <div class="topic">수가 체계<em>Part 2 · 수가</em></div>
+        <div class="det">
+          <a href="https://www.hira.or.kr" target="_blank" rel="noopener">건강보험심사평가원</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>건강보험 요양급여비용</span>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>상대가치점수 환산지수</span>
+        </div>
+      </div>
+      <div class="refrow">
+        <div class="topic">작업치료 산정<em>Part 2 · 수가</em></div>
+        <div class="det">
+          <a href="https://www.hira.or.kr" target="_blank" rel="noopener">요양급여비용 산정지침</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>작업치료 수가 산정지침</span>
+        </div>
+      </div>
+      <div class="refrow">
+        <div class="topic">시범사업<em>Part 3 · 정책</em></div>
+        <div class="det">
+          <a href="https://www.mohw.go.kr" target="_blank" rel="noopener">보건복지부</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>어린이 재활의료기관 시범사업</span>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>통합계획교육상담료 지역사회연계료</span>
+        </div>
+      </div>
+      <div class="refrow">
+        <div class="topic">운영지침<em>Part 3 · 실무</em></div>
+        <div class="det">
+          <a href="https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020002000100&brdScnBltNo=4&brdBltNo=10895" target="_blank" rel="noopener">시범사업 운영지침</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>어린이 재활의료기관 운영지침</span>
+        </div>
+      </div>
+      <div class="refrow">
+        <div class="topic">ICF<em>Part 4 · 분류</em></div>
+        <div class="det">
+          <a href="https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health" target="_blank" rel="noopener">WHO · ICF</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>국제기능장애건강분류</span>
+        </div>
+      </div>
+      <div class="refrow">
+        <div class="topic">작업 스펙트럼<em>Part 4 · OT</em></div>
+        <div class="det">
+          <a href="https://pubmed.ncbi.nlm.nih.gov/23311311/" target="_blank" rel="noopener">Fisher AG (2013)</a>
+          <span class="kw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>occupation-centred based focused</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 15 : H.OT MORNING BRIEF newsletter ===== -->
+<section class="slide" data-part="6">
+  <div class="rail"><span class="pno">H.OT Brief</span><span class="pbig">15</span><span class="pseg"><i></i><i></i><i></i><i></i></span></div>
+  <div class="inner">
+    <div class="eyebrow"><span class="dot"></span>작업치료 주간 브리핑 메일 신청</div>
+    <h1 class="title h1">H.OT MORNING BRIEF</h1>
+    <div class="nllayout">
+      <div class="nlinfo">
+        <p class="lead" style="margin-top:6px;font-size:15px">매주 월요일 아침, 작업치료 이슈를 한 통의 메일로.</p>
+        <div class="nlinfolist">
+          <div class="nlrow"><span class="k">발송</span><span class="v">매주 월요일 오전 9시</span></div>
+          <div class="nlrow"><span class="k">내용</span><span class="v">작업치료 관련 주요 뉴스 · 정책</span></div>
+          <div class="nlrow"><span class="k">대상</span><span class="v">교육 참가자 · 수신 신청자</span></div>
+        </div>
+        <div class="nlcta">💬 <b>카카오톡 오픈채팅방 참여</b> — 오픈채팅방에서 수신 신청하면 다음 주 월요일부터 받아보실 수 있습니다.</div>
+      </div>
+      <div class="nlframe">
+        <div class="nlmail">
+          <div class="d">2026.06.15 (월)</div>
+          <h3>H.OT MORNING BRIEF</h3>
+          <div class="sub">오늘의 작업치료 이슈, 실무에 연결하는 아침 브리핑</div>
+          <div class="note">
+            <div class="lbl">EDITOR'S NOTE</div>
+            <p>발달재활서비스 단가 인상과 어린이 재활 인프라 확충 논의가 이어지는 한 주. 근거 기반 중재와 제도 변화를 함께 살펴 실무에 연결할 시점.</p>
+          </div>
+          <div class="cat">주요 뉴스</div>
+          <div class="art">
+            <div class="t">발달장애 아동 재활치료 접근성 개선 방안 발표</div>
+            <div class="s">권역별 어린이 재활의료기관 확충과 지역사회 연계 강화 계획이 제시됨.</div>
+            <div class="src">○○일보</div>
+            <div class="lk">원문 보기 →</div>
+          </div>
+          <div class="cat">정책</div>
+          <div class="art" style="border-bottom:none;padding-bottom:0">
+            <div class="t">보건복지부, 발달재활서비스 바우처 단가 조정 검토</div>
+            <div class="s">서비스 제공기관과 이용 가정의 부담을 함께 고려한 조정 방향을 논의.</div>
+            <div class="src">보건복지부</div>
+          </div>
+          <div class="foot">© 2026 H.OT MORNING BRIEF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /stage -->
+
+<div class="dots" id="dots"></div>
+<div class="hud">
+  <div class="lbl" id="partlbl">Intro</div>
+  <div class="nav">
+    <button id="prev" aria-label="이전 슬라이드">‹</button>
+    <div class="counter"><b id="cur">1</b><span> / </span><span id="tot">12</span></div>
+    <button id="next" aria-label="다음 슬라이드">›</button>
+    <button id="printBtn" aria-label="PDF로 저장 / 인쇄" title="PDF로 저장 · 인쇄 (P)" style="width:auto;padding:0 13px;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.04em">PDF</button>
+  </div>
+  <div class="lbl">근거기반의 작업치료</div>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const partNames=['도입','Part 1 · EBP','Part 2 · 수가체계','Part 3 · 시범사업','Part 4 · ICF','참고자료','H.OT Brief'];
+let idx=0;
+const dots=document.getElementById('dots');
+slides.forEach((s,i)=>{const d=document.createElement('i');d.onclick=()=>go(i);dots.appendChild(d);});
+const dotEls=[...dots.children];
+document.getElementById('tot').textContent=slides.length;
+
+function go(n){
+  idx=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>{
+    s.classList.toggle('active',i===idx);
+    s.classList.toggle('prev',i<idx);
+  });
+  dotEls.forEach((d,i)=>d.classList.toggle('on',i===idx));
+  document.getElementById('cur').textContent=idx+1;
+  document.getElementById('progress').style.width=((idx+1)/slides.length*100)+'%';
+  document.getElementById('partlbl').textContent=partNames[+slides[idx].dataset.part];
+}
+document.getElementById('next').onclick=()=>go(idx+1);
+document.getElementById('prev').onclick=()=>go(idx-1);
+document.getElementById('printBtn').onclick=()=>window.print();
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(idx+1);}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(idx-1);}
+  if(e.key==='Home')go(0);
+  if(e.key==='End')go(slides.length-1);
+  if(e.key==='p'||e.key==='P')window.print();
+});
+// Q&A toggles
+document.querySelectorAll('.qa .q').forEach(q=>{
+  q.onclick=()=>q.parentElement.classList.toggle('open');
+});
+// guard empty download links
+document.querySelectorAll('.dl').forEach(a=>{
+  a.addEventListener('click',e=>{
+    if(a.getAttribute('href')==='#'){e.preventDefault();a.style.outline='2px solid var(--gold)';setTimeout(()=>a.style.outline='',900);}
+  });
+});
+go(0);
+</script>
+</body>
+</html>
