@@ -1,6 +1,3 @@
-// T20 E2E 스모크 테스트 전용 — 실제 Claude API 호출 없이 결정론적으로 응답한다.
-// GENESIS_AI_PROVIDER=mock일 때만 사용 (프로덕션 경로에서는 선택되지 않음).
-
 import type {
   AIProvider,
   CompletionChunk,
@@ -8,29 +5,67 @@ import type {
   CompletionResult,
 } from "./types";
 
-const MOCK_QUESTION_JSON = JSON.stringify({
-  question: "이 프로젝트의 핵심 문제는 무엇인가요? (mock)",
-  why: "E2E 스모크 테스트용 고정 응답입니다.",
-  what: "실제 Claude API를 호출하지 않고 화면 배선만 검증합니다.",
-  how: "아무 옵션이나 선택하거나 직접 입력하세요.",
-  category: "problem_definition",
-  options: [
-    { label: "옵션 A", description: "mock 옵션 설명 A" },
-    { label: "옵션 B", description: "mock 옵션 설명 B" },
-  ],
-  is_phase_complete: false,
-});
-
+/**
+ * Mock provider for development/testing without API costs.
+ * Simulates Claude responses with realistic delays.
+ */
 export class MockProvider implements AIProvider {
   readonly name = "mock";
-  readonly model = "mock-v1";
+  readonly model: string;
 
-  async *stream(_req: CompletionRequest): AsyncIterable<CompletionChunk> {
-    yield { type: "text_delta", text: MOCK_QUESTION_JSON };
+  constructor(model: string = "mock-sonnet") {
+    this.model = model;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private getMockResponse(req: CompletionRequest): string {
+    const content = req.messages[req.messages.length - 1]?.content || "";
+
+    // 질문 유형별 목 응답
+    if (content.toLowerCase().includes("project")) {
+      return JSON.stringify({
+        decision: "web-app",
+        rationale: "[Mock] 이것은 테스트 응답입니다.",
+      });
+    }
+
+    if (content.toLowerCase().includes("target")) {
+      return JSON.stringify({
+        audience: "startup-founders",
+        painPoints: ["time-to-market", "design-implementation-gap"],
+      });
+    }
+
+    // 기본 응답
+    return JSON.stringify({
+      status: "mocked",
+      message: `Mock response to: ${content.substring(0, 50)}...`,
+    });
+  }
+
+  async *stream(req: CompletionRequest): AsyncIterable<CompletionChunk> {
+    const response = this.getMockResponse(req);
+
+    // 스트림 효과: 단어 단위로 느리게 전송
+    const words = response.split(" ");
+    for (const word of words) {
+      await this.delay(50); // 50ms 간격
+      yield { type: "text_delta", text: word + " " };
+    }
+
     yield { type: "done", stopReason: "end_turn" };
   }
 
-  async complete(_req: CompletionRequest): Promise<CompletionResult> {
-    return { text: MOCK_QUESTION_JSON, stopReason: "end_turn" };
+  async complete(req: CompletionRequest): Promise<CompletionResult> {
+    let text = "";
+
+    for await (const chunk of this.stream(req)) {
+      if (chunk.type === "text_delta") text += chunk.text;
+    }
+
+    return { text: text.trim(), stopReason: "end_turn" };
   }
 }

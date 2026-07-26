@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TABLES } from "@/lib/supabase/tables";
 import { PipelineStepper } from "@/components/pipeline-stepper";
+import { PhaseApproveButton } from "@/components/pipeline/phase-approve-button";
 import { PHASE_DOC_TYPES } from "@/engine/docgen";
 import type { PhaseName, PipelinePhase, Project } from "@/types/domain";
 
@@ -40,6 +41,25 @@ export default async function ProjectHomePage({
   const byPhase = new Map((phases ?? []).map((p) => [p.phase, p]));
   const activePhase = orderedPhases.find((p) => byPhase.get(p)?.status === "active");
 
+  // 문서 없는 단계(discover·handoff)가 in_review/stale이면 승인 UI가 필요하다 — 미정 결정 수를 미리 조회.
+  const noDocApprovablePhases = orderedPhases.filter((phase) => {
+    const status = byPhase.get(phase)?.status;
+    return PHASE_DOC_TYPES[phase].length === 0 && (status === "in_review" || status === "stale");
+  });
+  const pendingCounts = new Map(
+    await Promise.all(
+      noDocApprovablePhases.map(async (phase) => {
+        const { count } = await supabase
+          .from(TABLES.contextEntries)
+          .select("id", { count: "exact", head: true })
+          .eq("project_id", id)
+          .eq("phase", phase)
+          .eq("status", "pending");
+        return [phase, count ?? 0] as const;
+      }),
+    ),
+  );
+
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-8 p-8">
       <header className="space-y-1">
@@ -68,10 +88,21 @@ export default async function ProjectHomePage({
           const docTypes = PHASE_DOC_TYPES[phase];
           const hasDocs =
             docTypes.length > 0 && (p?.status === "in_review" || p?.status === "done");
+          const needsApproval = pendingCounts.has(phase);
+
           const row = (
             <div className="flex items-center justify-between rounded-lg border p-3 text-sm">
               <span className="font-medium">{LABELS[phase]}</span>
-              <span className="text-muted-foreground">{p?.status ?? "locked"}</span>
+              {needsApproval && p ? (
+                <PhaseApproveButton
+                  projectId={id}
+                  phase={phase}
+                  phaseStatus={p.status}
+                  pendingCount={pendingCounts.get(phase) ?? 0}
+                />
+              ) : (
+                <span className="text-muted-foreground">{p?.status ?? "locked"}</span>
+              )}
             </div>
           );
           return hasDocs ? (
