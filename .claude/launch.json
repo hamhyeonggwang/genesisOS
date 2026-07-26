@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "Genesis-OS"],
       "port": 3000
+    },
+    {
+      "name": "othub-portfolio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "Design/projects/clinical-system-portfolio", "--", "-p", "3001"],
+      "port": 3001
     }
   ]
 }
